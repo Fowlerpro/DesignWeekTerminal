@@ -11,7 +11,7 @@ public class TerminalGame
         Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteOnce;
         Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
 
-        Terminal.SetTitle("Title");
+        Terminal.SetTitle("Tales from the Past");
     }
 
     // Execute() runs based on Program.TerminalExecuteMode (assign to it in Setup).
