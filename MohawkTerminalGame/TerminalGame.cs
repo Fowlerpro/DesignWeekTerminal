@@ -10,11 +10,10 @@ public class TerminalGame
 
     /// Run once before Execute begins
     //Varaibles
+    public int enemyDamage = Random.Integer(1, 6);// Random generator from 1-5 to cause damage to the player
     public bool startGame = false;
-    public bool inCombatMode = false;
-    public int playerHealth = 40;//this is the player health change this to make the game easier or harder
     public int playerAbilites = 4;//number of ability points per round
-    public int enemyHealth = 20;// health of every single enemy
+    
     public void Setup()
     {
 
@@ -24,6 +23,7 @@ public class TerminalGame
 
         Terminal.SetTitle("Tales from the Past");
         intro();
+        RandomCards.cardMoves();
 
     }
 
@@ -36,31 +36,49 @@ public class TerminalGame
     {//Starts the game if player hits the spacebar
         if (!startGame)
         {
-            if (Input.IsKeyPressed(ConsoleKey.Spacebar))
+            if (Input.IsKeyPressed(ConsoleKey.M))
             {
                 startGame = true;
                 startArea();
             }
+            if (Input.IsKeyPressed(ConsoleKey.N))
+            {
+                startGame = true;
+                forest();
+            }
+            if (Input.IsKeyPressed(ConsoleKey.B))
+            {
+                startGame = true;
+                castle();
+            }
         }
-        if (playerHealth <= 0)
+        if (RandomCards.playerHealth <= 0)
         {
             intro();
             startGame = false;
-            playerHealth = 20;
+            RandomCards.playerHealth = 40;
         }// if player health falls to zero the title screen is displayed and player health is reset
         if (Input.IsKeyPressed(ConsoleKey.G))
         {
-            playerHealth -= 40;
+            RandomCards.playerHealth -= 40;
         }//debug Keybing to kill the player to test reset mechanic
-        if (Input.IsKeyPressed(ConsoleKey.H) && !inCombatMode)
+        if (Input.IsKeyPressed(ConsoleKey.H) && !RandomCards.inCombatMode)
         {
-            inCombatMode = true;
-            inCombat();
+            RandomCards.inCombatMode = true;
         }//debug to enter combat mode
-        if (enemyHealth <= 0)
+        if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
         {
-            inCombatMode = false;
-            Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+            RandomCards.inCombatMode = false;
+            //Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+            Console.WriteLine("Enemy Defeated");
+            playerAbilites = 4;
+        }
+        if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
+        {
+            RandomCards.playerHealth -= enemyDamage;
+            Console.WriteLine("The enemy has attacked you");
+            Console.WriteLine($"You have {RandomCards.playerHealth} health left");
+            RandomCards.takenDamage = false;
         }
     }
     public void intro()
@@ -92,13 +110,18 @@ public class TerminalGame
         // Clear window and draw map
         map.ClearWrite();
     }
-    public void inCombat()//combat mode, swaps to typing so the player can input card codes
+    public void forest()
     {
-        playerAbilites = 4;
-        enemyHealth = 20;
-        //resets default values and changes the mod to type
-        Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
-        string input = Terminal.ReadLine();
-
+        ColoredText empty = new(@",", ConsoleColor.Blue, ConsoleColor.Blue);
+        TerminalGridWithColor map;
+        map = new(50, 50, empty);
+        map.ClearWrite();
+    }
+    public void castle()
+    {
+        ColoredText empty = new(@",", ConsoleColor.Red, ConsoleColor.Red);
+        TerminalGridWithColor map;
+        map = new(50, 50, empty);
+        map.ClearWrite();
     }
 }
