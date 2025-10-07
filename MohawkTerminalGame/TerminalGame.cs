@@ -21,4 +21,15 @@ namespace MohawkTerminalGame
         int oldThiefX = 4, oldThiefY = 0;
 
     }
-}
+
+        // ---------------- Setup ----------------
+        public void Setup()
+        {
+            Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteTime;
+            Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+            Program.TargetFPS = 60;
+
+            Terminal.SetTitle("Tales of the Past");
+            Terminal.CursorVisible = false;
+        
+    
