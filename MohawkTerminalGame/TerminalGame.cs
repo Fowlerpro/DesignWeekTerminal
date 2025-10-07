@@ -11,7 +11,9 @@ public class TerminalGame
     /// Run once before Execute begins
     //Varaibles
     public bool startGame = false;
-    public int playerHealth = 20;//this is the player health change this to make the game easier or harder
+    public int playerHealth = 40;//this is the player health change this to make the game easier or harder
+    public int playerAbilites = 4;//number of ability points per round
+    public int enemyHealth = 20;// health of every single enemy
     public void Setup()
     {
 
@@ -79,5 +81,10 @@ public class TerminalGame
 
         // Clear window and draw map
         map.ClearWrite();
+    }
+    public void inCombat()
+    {
+        playerAbilites = 4;
+        enemyHealth = 20;
     }
 }
