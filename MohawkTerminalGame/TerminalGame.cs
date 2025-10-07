@@ -36,16 +36,8 @@ public class TerminalGame
             {
                 startGame = true;
                 startArea();
-                Console.WriteLine(startGame);
             }
         }
-        if (Input.IsKeyPressed(ConsoleKey.RightArrow))
-            Console.WriteLine(startGame);
-    }
-    public void Update()
-    {
-        if (Input.IsKeyPressed(ConsoleKey.RightArrow))
-            Console.WriteLine(startGame);
     }
     public void intro()
     {
