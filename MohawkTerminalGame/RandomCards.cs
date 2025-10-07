@@ -15,11 +15,10 @@ public static class RandomCards
         if (inCombatMode)
         {
             enemyHealth = 20;
-            Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
             Console.WriteLine($"inCombatMode is {inCombatMode}");
             if (!waitingResponse)
             {
-
+                Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
                 waitingResponse = true;
                 string input = Terminal.ReadLine();
                 Console.WriteLine($"waitingResponse is {waitingResponse}");
