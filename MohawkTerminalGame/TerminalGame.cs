@@ -11,6 +11,7 @@ public class TerminalGame
     /// Run once before Execute begins
     //Varaibles
     public bool startGame = false;
+    public bool inCombatMode = false;
     public int playerHealth = 40;//this is the player health change this to make the game easier or harder
     public int playerAbilites = 4;//number of ability points per round
     public int enemyHealth = 20;// health of every single enemy
@@ -49,8 +50,18 @@ public class TerminalGame
         }// if player health falls to zero the title screen is displayed and player health is reset
         if (Input.IsKeyPressed(ConsoleKey.G))
         {
-            playerHealth -= 20;
+            playerHealth -= 40;
         }//debug Keybing to kill the player to test reset mechanic
+        if (Input.IsKeyPressed(ConsoleKey.H) && !inCombatMode)
+        {
+            inCombatMode = true;
+            inCombat();
+        }//debug to enter combat mode
+        if (enemyHealth <= 0)
+        {
+            inCombatMode = false;
+            Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+        }
     }
     public void intro()
     {//Starting title screen
@@ -73,7 +84,6 @@ public class TerminalGame
         ColoredText tree = new(@"/\", ConsoleColor.Green, ConsoleColor.DarkGreen);
         ColoredText riverNS = new(@"||", ConsoleColor.Blue, ConsoleColor.DarkBlue);
         ColoredText riverEW = new(@"==", ConsoleColor.Blue, ConsoleColor.DarkBlue);
-        ColoredText player = new(@"😎", ConsoleColor.White, ConsoleColor.Black);
         TerminalGridWithColor map;
         map = new(10, 10, tree);
         map.SetCol(riverNS, 3);
@@ -82,9 +92,13 @@ public class TerminalGame
         // Clear window and draw map
         map.ClearWrite();
     }
-    public void inCombat()
+    public void inCombat()//combat mode, swaps to typing so the player can input card codes
     {
         playerAbilites = 4;
         enemyHealth = 20;
+        //resets default values and changes the mod to type
+        Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
+        string input = Terminal.ReadLine();
+
     }
 }
