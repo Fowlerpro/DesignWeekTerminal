@@ -11,6 +11,7 @@ public class TerminalGame
     /// Run once before Execute begins
     //Varaibles
     public bool startGame = false;
+    public int playerHealth = 20;
     public void Setup()
     {
 
@@ -37,6 +38,16 @@ public class TerminalGame
                 startGame = true;
                 startArea();
             }
+        }
+        if (playerHealth <= 0)
+        {
+            intro();
+            startGame = false;
+            playerHealth = 20;
+        }
+        if (Input.IsKeyPressed(ConsoleKey.G))
+        {
+            playerHealth -= 20;
         }
     }
     public void intro()
