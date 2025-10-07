@@ -31,13 +31,13 @@ namespace MohawkTerminalGame
 
             Terminal.SetTitle("Tales of the Past");
             Terminal.CursorVisible = false;
-
+            Terminal.CursorVisible = true;
             // Dynamically size the map to fill the terminal
             int gridWidth = Console.WindowWidth / 2; // each tile is 2 columns wide
             int gridHeight = Console.WindowHeight;
 
             // Initialize map with base tiles (green field)
-            map = new TerminalGridWithColor(gridWidth, gridHeight, new ColoredText("  ", ConsoleColor.DarkBlue, ConsoleColor.DarkBlue));
+            map = new TerminalGridWithColor(gridWidth, gridHeight, new ColoredText("  ", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen));
 
             // Draw the map to terminal
             map.ClearWrite();
