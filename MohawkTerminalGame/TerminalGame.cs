@@ -103,6 +103,34 @@ namespace MohawkTerminalGame
             thiefY = Math.Clamp(thiefY, 0, map.Height - 1);
         }
 
+        // ---------------- Drawing ----------------
+        void UpdateCharacter(ref int oldX, ref int oldY, int newX, int newY, ColoredText character)
+        {
+            if (oldX != newX || oldY != newY)
+            {
+                ResetCell(oldX, oldY);
+                DrawCharacter(newX, newY, character);
+
+                oldX = newX;
+                oldY = newY;
+            }
+        }
+
+        void DrawCharacter(int x, int y, ColoredText character)
+        {
+            ColoredText tile = map.Get(x, y);
+            character.bgColor = tile.bgColor; // preserve background color
+            map.Poke(x * 2, y, character);
+        }
+
+        void ResetCell(int x, int y)
+        {
+            ColoredText tile = map.Get(x, y);
+            map.Poke(x * 2, y, tile); // restore base tile
+        }
+    }
+}
+
 
 
 
