@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MohawkTerminalGame;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DefaultNamespace
 {
-    internal class Knight
+    internal class Knight 
     {
+        
     }
 }
