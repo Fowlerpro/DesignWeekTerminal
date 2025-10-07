@@ -10,11 +10,11 @@ public class TerminalGame
 
     /// Run once before Execute begins
     //Varaibles
+    public int enemyDamage = Random.Integer(1, 6);// Random generator from 1-5 to cause damage to the player
     public bool startGame = false;
     public bool inCombatMode = false;
-    public int playerHealth = 40;//this is the player health change this to make the game easier or harder
     public int playerAbilites = 4;//number of ability points per round
-    public int enemyHealth = 20;// health of every single enemy
+    
     public void Setup()
     {
 
@@ -24,6 +24,7 @@ public class TerminalGame
 
         Terminal.SetTitle("Tales from the Past");
         intro();
+        RandomCards.cardMoves();
 
     }
 
@@ -42,25 +43,32 @@ public class TerminalGame
                 startArea();
             }
         }
-        if (playerHealth <= 0)
+        if (RandomCards.playerHealth <= 0)
         {
             intro();
             startGame = false;
-            playerHealth = 20;
+            RandomCards.playerHealth = 40;
         }// if player health falls to zero the title screen is displayed and player health is reset
         if (Input.IsKeyPressed(ConsoleKey.G))
         {
-            playerHealth -= 40;
+            RandomCards.playerHealth -= 40;
         }//debug Keybing to kill the player to test reset mechanic
         if (Input.IsKeyPressed(ConsoleKey.H) && !inCombatMode)
         {
             inCombatMode = true;
             inCombat();
         }//debug to enter combat mode
-        if (enemyHealth <= 0)
+        if (RandomCards.enemyHealth <= 0)
         {
             inCombatMode = false;
             Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+            Console.WriteLine("Enemy Defeated");
+        }
+        if (RandomCards.takenDamage)
+        {
+            RandomCards.playerHealth -= enemyDamage;
+            Console.WriteLine($"You have {RandomCards.playerHealth} left");
+            RandomCards.takenDamage = false;
         }
     }
     public void intro()
@@ -95,10 +103,11 @@ public class TerminalGame
     public void inCombat()//combat mode, swaps to typing so the player can input card codes
     {
         playerAbilites = 4;
-        enemyHealth = 20;
+        RandomCards.enemyHealth = 20;
         //resets default values and changes the mod to type
         Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
         string input = Terminal.ReadLine();
+        
 
     }
 }
