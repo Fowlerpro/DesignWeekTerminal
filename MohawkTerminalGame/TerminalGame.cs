@@ -20,7 +20,7 @@ namespace MohawkTerminalGame
         int thiefX = 4, thiefY = 0;
         int oldThiefX = 4, oldThiefY = 0;
 
-    }
+    
 
         // ---------------- Setup ----------------
         public void Setup()
@@ -31,5 +31,25 @@ namespace MohawkTerminalGame
 
             Terminal.SetTitle("Tales of the Past");
             Terminal.CursorVisible = false;
-        
-    
+
+            // Dynamically size the map to fill the terminal
+            int gridWidth = Console.WindowWidth / 2; // each tile is 2 columns wide
+            int gridHeight = Console.WindowHeight;
+
+            // Initialize map with base tiles (green field)
+            map = new TerminalGridWithColor(gridWidth, gridHeight, new ColoredText("  ", ConsoleColor.DarkBlue, ConsoleColor.DarkBlue));
+
+            // Draw the map to terminal
+            map.ClearWrite();
+
+            // Draw initial characters
+            DrawCharacter(knightX, knightY, knightChar);
+            DrawCharacter(witchX, witchY, witchChar);
+            DrawCharacter(thiefX, thiefY, thiefChar);
+        }
+
+
+
+
+
+
