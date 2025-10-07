@@ -60,6 +60,48 @@ namespace MohawkTerminalGame
             UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
             UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
         }
+        // ---------------- Movement ----------------
+        void MoveKnight()
+        {
+            oldKnightX = knightX;
+            oldKnightY = knightY;
+
+            if (Input.IsKeyPressed(ConsoleKey.RightArrow)) knightX++;
+            if (Input.IsKeyPressed(ConsoleKey.LeftArrow)) knightX--;
+            if (Input.IsKeyPressed(ConsoleKey.UpArrow)) knightY--;
+            if (Input.IsKeyPressed(ConsoleKey.DownArrow)) knightY++;
+
+            knightX = Math.Clamp(knightX, 0, map.Width - 1);
+            knightY = Math.Clamp(knightY, 0, map.Height - 1);
+        }
+
+        void MoveWitch()
+        {
+            oldWitchX = witchX;
+            oldWitchY = witchY;
+
+            if (Input.IsKeyPressed(ConsoleKey.D)) witchX++;
+            if (Input.IsKeyPressed(ConsoleKey.A)) witchX--;
+            if (Input.IsKeyPressed(ConsoleKey.W)) witchY--;
+            if (Input.IsKeyPressed(ConsoleKey.S)) witchY++;
+
+            witchX = Math.Clamp(witchX, 0, map.Width - 1);
+            witchY = Math.Clamp(witchY, 0, map.Height - 1);
+        }
+
+        void MoveThief()
+        {
+            oldThiefX = thiefX;
+            oldThiefY = thiefY;
+
+            if (Input.IsKeyPressed(ConsoleKey.L)) thiefX++;
+            if (Input.IsKeyPressed(ConsoleKey.J)) thiefX--;
+            if (Input.IsKeyPressed(ConsoleKey.I)) thiefY--;
+            if (Input.IsKeyPressed(ConsoleKey.K)) thiefY++;
+
+            thiefX = Math.Clamp(thiefX, 0, map.Width - 1);
+            thiefY = Math.Clamp(thiefY, 0, map.Height - 1);
+        }
 
 
 
