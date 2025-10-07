@@ -47,6 +47,19 @@ namespace MohawkTerminalGame
             DrawCharacter(witchX, witchY, witchChar);
             DrawCharacter(thiefX, thiefY, thiefChar);
         }
+        // ---------------- Main Loop ----------------
+        public void Execute()
+        {
+            // Move characters based on input
+            MoveKnight();
+            MoveWitch();
+            MoveThief();
+
+            // Update characters on the map if they moved
+            UpdateCharacter(ref oldKnightX, ref oldKnightY, knightX, knightY, knightChar);
+            UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
+            UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
+        }
 
 
 
