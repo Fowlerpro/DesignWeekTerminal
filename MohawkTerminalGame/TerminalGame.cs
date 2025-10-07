@@ -11,7 +11,7 @@ public class TerminalGame
     /// Run once before Execute begins
     //Varaibles
     public bool startGame = false;
-    public int playerHealth = 20;
+    public int playerHealth = 20;//this is the player health change this to make the game easier or harder
     public void Setup()
     {
 
@@ -30,7 +30,7 @@ public class TerminalGame
     //  ExecuteTime: runs at timed intervals (eg. "FPS"). Code tries to run at Program.TargetFPS.
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
-    {
+    {//Starts the game if player hits the spacebar
         if (!startGame)
         {
             if (Input.IsKeyPressed(ConsoleKey.Spacebar))
@@ -44,14 +44,14 @@ public class TerminalGame
             intro();
             startGame = false;
             playerHealth = 20;
-        }
+        }// if player health falls to zero the title screen is displayed and player health is reset
         if (Input.IsKeyPressed(ConsoleKey.G))
         {
             playerHealth -= 20;
-        }
+        }//debug Keybing to kill the player to test reset mechanic
     }
     public void intro()
-    {
+    {//Starting title screen
         ColoredText empty = new(@",", ConsoleColor.Green, ConsoleColor.DarkGreen);
         ColoredText borderL = new(@"||", ConsoleColor.White, ConsoleColor.DarkGreen);
         ColoredText borderR = new(@"||", ConsoleColor.White, ConsoleColor.DarkGreen);
@@ -66,7 +66,7 @@ public class TerminalGame
         map.ClearWrite();
     }
     public void startArea()
-    {
+    {//first level
         // Set map to some values
         ColoredText tree = new(@"/\", ConsoleColor.Green, ConsoleColor.DarkGreen);
         ColoredText riverNS = new(@"||", ConsoleColor.Blue, ConsoleColor.DarkBlue);
