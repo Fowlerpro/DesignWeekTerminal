@@ -16,6 +16,7 @@ public static class RandomCards
 
             
     enemyHealth -= 1;
+            Terminal.WriteLine("you attacked the enemy")
 			Terminal.WriteLine($"Enemy has {enemyHealth} Health");
             takenDamage = true;
             

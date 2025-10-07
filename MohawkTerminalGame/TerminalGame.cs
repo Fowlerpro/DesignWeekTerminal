@@ -58,16 +58,17 @@ public class TerminalGame
             inCombatMode = true;
             inCombat();
         }//debug to enter combat mode
-        if (RandomCards.enemyHealth <= 0)
+        if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
         {
             inCombatMode = false;
             Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
             Console.WriteLine("Enemy Defeated");
         }
-        if (RandomCards.takenDamage)
+        if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
         {
             RandomCards.playerHealth -= enemyDamage;
-            Console.WriteLine($"You have {RandomCards.playerHealth} left");
+            Console.WriteLine("The enemy has attacked you");
+            Console.WriteLine($"You have {RandomCards.playerHealth} health left");
             RandomCards.takenDamage = false;
         }
     }
