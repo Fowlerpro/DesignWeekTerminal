@@ -12,7 +12,6 @@ public class TerminalGame
     //Varaibles
     public int enemyDamage = Random.Integer(1, 6);// Random generator from 1-5 to cause damage to the player
     public bool startGame = false;
-    public bool inCombatMode = false;
     public int playerAbilites = 4;//number of ability points per round
     
     public void Setup()
@@ -53,16 +52,16 @@ public class TerminalGame
         {
             RandomCards.playerHealth -= 40;
         }//debug Keybing to kill the player to test reset mechanic
-        if (Input.IsKeyPressed(ConsoleKey.H) && !inCombatMode)
+        if (Input.IsKeyPressed(ConsoleKey.H) && !RandomCards.inCombatMode)
         {
-            inCombatMode = true;
-            inCombat();
+            RandomCards.inCombatMode = true;
         }//debug to enter combat mode
         if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
         {
-            inCombatMode = false;
-            Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+            RandomCards.inCombatMode = false;
+            //Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
             Console.WriteLine("Enemy Defeated");
+            playerAbilites = 4;
         }
         if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
         {
@@ -100,15 +99,5 @@ public class TerminalGame
 
         // Clear window and draw map
         map.ClearWrite();
-    }
-    public void inCombat()//combat mode, swaps to typing so the player can input card codes
-    {
-        playerAbilites = 4;
-        RandomCards.enemyHealth = 20;
-        //resets default values and changes the mod to type
-        Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
-        string input = Terminal.ReadLine();
-        
-
     }
 }
