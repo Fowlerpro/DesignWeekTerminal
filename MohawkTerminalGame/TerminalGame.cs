@@ -36,10 +36,20 @@ public class TerminalGame
     {//Starts the game if player hits the spacebar
         if (!startGame)
         {
-            if (Input.IsKeyPressed(ConsoleKey.Spacebar))
+            if (Input.IsKeyPressed(ConsoleKey.M))
             {
                 startGame = true;
                 startArea();
+            }
+            if (Input.IsKeyPressed(ConsoleKey.N))
+            {
+                startGame = true;
+                forest();
+            }
+            if (Input.IsKeyPressed(ConsoleKey.B))
+            {
+                startGame = true;
+                castle();
             }
         }
         if (RandomCards.playerHealth <= 0)
@@ -98,6 +108,20 @@ public class TerminalGame
         map.SetRow(riverEW, 8);
 
         // Clear window and draw map
+        map.ClearWrite();
+    }
+    public void forest()
+    {
+        ColoredText empty = new(@",", ConsoleColor.Blue, ConsoleColor.Blue);
+        TerminalGridWithColor map;
+        map = new(50, 50, empty);
+        map.ClearWrite();
+    }
+    public void castle()
+    {
+        ColoredText empty = new(@",", ConsoleColor.Red, ConsoleColor.Red);
+        TerminalGridWithColor map;
+        map = new(50, 50, empty);
         map.ClearWrite();
     }
 }
