@@ -103,14 +103,30 @@ public class TerminalGame
             startGame = false;
             RandomCards.playerHealth = 40;
         }// if player health falls to zero the title screen is displayed and player health is reset
+        //
+        //
+        //
         if (Input.IsKeyPressed(ConsoleKey.G))
         {
             RandomCards.playerHealth -= 40;
         }//debug Keybing to kill the player to test reset mechanic
+        if (Input.IsKeyPressed(ConsoleKey.B))
+        {
+            RandomCards.playerHealth += 40;
+            Console.WriteLine(RandomCards.playerHealth);
+        }//debug Keybing to reset play health when they go above 40
+        if (RandomCards.playerHealth >= 41)
+        {
+            RandomCards.playerHealth = 40;
+            Console.WriteLine("trying to reset");
+        }
         if (Input.IsKeyPressed(ConsoleKey.H) && !RandomCards.inCombatMode)
         {
             RandomCards.inCombatMode = true;
         }//debug to enter combat mode
+        //
+        //Debug Commands
+        //
         if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
         {
             RandomCards.inCombatMode = false;
@@ -259,12 +275,5 @@ public class TerminalGame
     public void intro()
     {//Starting title screen
 
-    }
-    public void startArea()
-    {//first level
-        // Set map to some values
-      
-        // Clear window and draw map
-        map.ClearWrite();
     }
 }

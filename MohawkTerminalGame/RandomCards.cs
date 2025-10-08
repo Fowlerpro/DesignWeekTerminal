@@ -14,25 +14,25 @@ public static class RandomCards
     {
         if (inCombatMode)
         {
-            enemyHealth = 20;
-            Console.WriteLine($"inCombatMode is {inCombatMode}");
-            if (!waitingResponse)
-            {
-                Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
-                waitingResponse = true;
-                string input = Terminal.ReadLine();
-                Console.WriteLine($"waitingResponse is {waitingResponse}");
-                if (input == "atk1")
-                {
+            //enemyHealth = 20;
+            //Console.WriteLine($"inCombatMode is {inCombatMode}");
+            //if (!waitingResponse)
+            //{
+            //    Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
+            //    waitingResponse = true;
+            //    string input = Terminal.ReadLine();
+            //    Console.WriteLine($"waitingResponse is {waitingResponse}");
+            //    if (input == "atk1")
+            //    {
 
-                    enemyHealth -= 1;
-                    Terminal.WriteLine("you attacked the enemy");
-                    Terminal.WriteLine($"Enemy has {enemyHealth} Health");
-                    takenDamage = true;
-                    waitingResponse = false;
+            //        enemyHealth -= 1;
+            //        Terminal.WriteLine("you attacked the enemy");
+            //        Terminal.WriteLine($"Enemy has {enemyHealth} Health");
+            //        takenDamage = true;
+            //        waitingResponse = false;
 
-                }
-            }
+            //    }
+            //}
         }
     }
 }
