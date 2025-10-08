@@ -28,7 +28,7 @@ namespace MohawkTerminalGame
         (int x, int y, ColoredText sprite)[] forestEnemies;
         (int x, int y, ColoredText sprite)[] castleEnemies;
 
-       
+
         public void Setup()
         {
             Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteTime;
@@ -47,9 +47,16 @@ namespace MohawkTerminalGame
             SetupEnemies(width, height);
             DrawEnemies();
 
-            // Initialize players at bottom-left
-            knightX = witchX = thiefX = 0;
-            knightY = witchY = thiefY = height - 1;
+            // Initialize players at middle-left with vertical offset
+            int middleY = map.Height / 2;
+
+            knightX = 0;
+            knightY = middleY;           // Middle
+            witchX = 0;
+            witchY = middleY - 1;       // One above middle
+            thiefX = 0;
+            thiefY = middleY + 1;       // One below middle
+
             oldKnightX = knightX; oldKnightY = knightY;
             oldWitchX = witchX; oldWitchY = witchY;
             oldThiefX = thiefX; oldThiefY = thiefY;
