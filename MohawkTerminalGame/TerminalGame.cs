@@ -10,9 +10,9 @@ namespace MohawkTerminalGame
         // Characters
         ColoredText knightChar = new(@"⚔", ConsoleColor.DarkGray, ConsoleColor.DarkGray);
         int knightX, knightY, oldKnightX, oldKnightY;
-        ColoredText witchChar = new(@"⚔", ConsoleColor.Magenta, ConsoleColor.Magenta);
+        ColoredText witchChar = new(@"♛", ConsoleColor.Magenta, ConsoleColor.Magenta);
         int witchX, witchY, oldWitchX, oldWitchY;
-        ColoredText thiefChar = new(@"⚔", ConsoleColor.DarkRed, ConsoleColor.DarkRed);
+        ColoredText thiefChar = new(@"☠", ConsoleColor.DarkRed, ConsoleColor.DarkRed);
         int thiefX, thiefY, oldThiefX, oldThiefY;
 
         bool knightMovedThisFrame, witchMovedThisFrame, thiefMovedThisFrame;
@@ -236,3 +236,4 @@ namespace MohawkTerminalGame
         }
     }
 }
+    //STRONGLY RECOMMEND MOVING THE CHARACTERS PRESSING THE HOTKEY ONCE, NOT HOLDING IT AS IT MAY CAUSE BUGS.
