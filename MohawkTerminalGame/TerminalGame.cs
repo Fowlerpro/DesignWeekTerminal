@@ -7,132 +7,140 @@ namespace MohawkTerminalGame
     {
         TerminalGridWithColor map;
 
-        // ---------------- Characters ----------------
+        // Characters
         ColoredText knightChar = new(@"⚔", ConsoleColor.White, ConsoleColor.Black);
-        int knightX = 0, knightY = 0;
-        int oldKnightX = 0, oldKnightY = 0;
-
+        int knightX, knightY, oldKnightX, oldKnightY;
         ColoredText witchChar = new(@"⚔", ConsoleColor.Magenta, ConsoleColor.Black);
-        int witchX = 2, witchY = 0;
-        int oldWitchX = 2, oldWitchY = 0;
-
+        int witchX, witchY, oldWitchX, oldWitchY;
         ColoredText thiefChar = new(@"⚔", ConsoleColor.DarkGray, ConsoleColor.Black);
-        int thiefX = 4, thiefY = 0;
-        int oldThiefX = 4, oldThiefY = 0;
+        int thiefX, thiefY, oldThiefX, oldThiefY;
 
-    
+        // Movement flags
+        bool knightMovedThisFrame = false, witchMovedThisFrame = false, thiefMovedThisFrame = false;
 
-        // ---------------- Setup ----------------
+        ColoredText[,] backgroundTiles;
+
         public void Setup()
         {
             Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteTime;
             Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
             Program.TargetFPS = 60;
-
             Terminal.SetTitle("Tales of the Past");
             Terminal.CursorVisible = false;
-            Terminal.CursorVisible = true;
-            // Dynamically size the map to fill the terminal
-            int gridWidth = Console.WindowWidth / 2; // each tile is 2 columns wide
-            int gridHeight = Console.WindowHeight;
 
-            // Initialize map with base tiles (green field)
-            map = new TerminalGridWithColor(gridWidth, gridHeight, new ColoredText("  ", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen));
+            int width = Console.WindowWidth / 2;
+            int height = Console.WindowHeight;
+            map = new TerminalGridWithColor(width, height, new ColoredText("  ", ConsoleColor.Black, ConsoleColor.Black));
+            backgroundTiles = new ColoredText[width, height];
 
-            // Draw the map to terminal
-            map.ClearWrite();
+            DrawAreas(width, height);
 
-            // Draw initial characters
+            // Start players at bottom-left
+            knightX = witchX = thiefX = 0;
+            knightY = witchY = thiefY = height - 1;
+            oldKnightX = knightX; oldKnightY = knightY;
+            oldWitchX = witchX; oldWitchY = witchY;
+            oldThiefX = thiefX; oldThiefY = thiefY;
+
             DrawCharacter(knightX, knightY, knightChar);
             DrawCharacter(witchX, witchY, witchChar);
             DrawCharacter(thiefX, thiefY, thiefChar);
         }
-        // ---------------- Main Loop ----------------
+
         public void Execute()
         {
-            // Move characters based on input
-            MoveKnight();
-            MoveWitch();
-            MoveThief();
+            knightMovedThisFrame = witchMovedThisFrame = thiefMovedThisFrame = false;
+            Move(ref knightX, ref knightY, ref knightMovedThisFrame, ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
+            Move(ref witchX, ref witchY, ref witchMovedThisFrame, ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D);
+            Move(ref thiefX, ref thiefY, ref thiefMovedThisFrame, ConsoleKey.I, ConsoleKey.K, ConsoleKey.J, ConsoleKey.L);
 
-            // Update characters on the map if they moved
             UpdateCharacter(ref oldKnightX, ref oldKnightY, knightX, knightY, knightChar);
             UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
             UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
         }
-        // ---------------- Movement ----------------
-        void MoveKnight()
+
+        void DrawAreas(int width, int height)
         {
-            oldKnightX = knightX;
-            oldKnightY = knightY;
+            int third = width / 3;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    ColoredText tile;
 
-            if (Input.IsKeyPressed(ConsoleKey.RightArrow)) knightX++;
-            if (Input.IsKeyPressed(ConsoleKey.LeftArrow)) knightX--;
-            if (Input.IsKeyPressed(ConsoleKey.UpArrow)) knightY--;
-            if (Input.IsKeyPressed(ConsoleKey.DownArrow)) knightY++;
+                    if (x < third) // Town
+                    {
+                        tile = new ColoredText("  ", ConsoleColor.Green, ConsoleColor.Green);
+                        if ((x % 10 == 2 || x % 10 == 7) && (y % 6 == 2))
+                            tile = new ColoredText("🏠", ConsoleColor.Gray, ConsoleColor.Green);
+                        if (y % 6 == 3)
+                            tile = new ColoredText("~~", ConsoleColor.Blue, ConsoleColor.DarkBlue);
+                        if (y % 6 == 3 && x % 10 == 5)
+                            tile = new ColoredText("==", ConsoleColor.Yellow, ConsoleColor.Green);
+                    }
+                    else if (x < 2 * third) // Forest
+                    {
+                        tile = new ColoredText("  ", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen);
+                        if ((x % 6 == 1 || x % 6 == 4) && (y % 5 == 1 || y % 5 == 3))
+                            tile = new ColoredText("🌲", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen);
+                        if ((x % 7 == 3 || x % 7 == 5) && y % 6 == 2)
+                            tile = new ColoredText("🌸", ConsoleColor.Magenta, ConsoleColor.DarkGreen);
+                    }
+                    else // Castle
+                    {
+                        tile = new ColoredText("  ", ConsoleColor.Gray, ConsoleColor.DarkGray);
+                        if (y == height - 6)
+                            tile = new ColoredText("==", ConsoleColor.Gray, ConsoleColor.DarkGray);
+                        if ((x % 7 == 3) && y % 6 == 1 && y < height - 6)
+                            tile = new ColoredText("🪟", ConsoleColor.Cyan, ConsoleColor.DarkGray);
+                        if ((x % 6 == 2 || x % 6 == 4) && y >= 0 && y <= height / 4)
+                            tile = new ColoredText("🔶", ConsoleColor.Yellow, ConsoleColor.DarkGray);
+                        if (y > height - 5)
+                            tile = new ColoredText("~~", ConsoleColor.Red, ConsoleColor.DarkRed);
+                    }
 
-            knightX = Math.Clamp(knightX, 0, map.Width - 1);
-            knightY = Math.Clamp(knightY, 0, map.Height - 1);
+                    backgroundTiles[x, y] = tile;
+                    map.Poke(x * 2, y, tile);
+                }
+            }
         }
 
-        void MoveWitch()
+        void Move(ref int x, ref int y, ref bool moved, ConsoleKey up, ConsoleKey down, ConsoleKey left, ConsoleKey right)
         {
-            oldWitchX = witchX;
-            oldWitchY = witchY;
-
-            if (Input.IsKeyPressed(ConsoleKey.D)) witchX++;
-            if (Input.IsKeyPressed(ConsoleKey.A)) witchX--;
-            if (Input.IsKeyPressed(ConsoleKey.W)) witchY--;
-            if (Input.IsKeyPressed(ConsoleKey.S)) witchY++;
-
-            witchX = Math.Clamp(witchX, 0, map.Width - 1);
-            witchY = Math.Clamp(witchY, 0, map.Height - 1);
+            if (moved) return;
+            int newX = x, newY = y;
+            if (Input.IsKeyPressed(right)) newX++;
+            if (Input.IsKeyPressed(left)) newX--;
+            if (Input.IsKeyPressed(up)) newY--;
+            if (Input.IsKeyPressed(down)) newY++;
+            if (newX != x || newY != y)
+            {
+                x = Math.Clamp(newX, 0, map.Width - 1);
+                y = Math.Clamp(newY, 0, map.Height - 1);
+                moved = true;
+            }
         }
 
-        void MoveThief()
-        {
-            oldThiefX = thiefX;
-            oldThiefY = thiefY;
-
-            if (Input.IsKeyPressed(ConsoleKey.L)) thiefX++;
-            if (Input.IsKeyPressed(ConsoleKey.J)) thiefX--;
-            if (Input.IsKeyPressed(ConsoleKey.I)) thiefY--;
-            if (Input.IsKeyPressed(ConsoleKey.K)) thiefY++;
-
-            thiefX = Math.Clamp(thiefX, 0, map.Width - 1);
-            thiefY = Math.Clamp(thiefY, 0, map.Height - 1);
-        }
-
-        // ---------------- Drawing ----------------
         void UpdateCharacter(ref int oldX, ref int oldY, int newX, int newY, ColoredText character)
         {
             if (oldX != newX || oldY != newY)
             {
                 ResetCell(oldX, oldY);
                 DrawCharacter(newX, newY, character);
-
-                oldX = newX;
-                oldY = newY;
+                oldX = newX; oldY = newY;
             }
         }
 
         void DrawCharacter(int x, int y, ColoredText character)
         {
-            ColoredText tile = map.Get(x, y);
-            character.bgColor = tile.bgColor; // preserve background color
+            ColoredText tile = backgroundTiles[x, y];
+            character.bgColor = tile.bgColor;
             map.Poke(x * 2, y, character);
         }
 
         void ResetCell(int x, int y)
         {
-            ColoredText tile = map.Get(x, y);
-            map.Poke(x * 2, y, tile); // restore base tile
+            map.Poke(x * 2, y, backgroundTiles[x, y]);
         }
     }
 }
-
-
-
-
-
-
