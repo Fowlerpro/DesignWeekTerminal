@@ -15,19 +15,15 @@ namespace MohawkTerminalGame
         ColoredText thiefChar = new(@"⚔", ConsoleColor.DarkRed, ConsoleColor.DarkRed);
         int thiefX, thiefY, oldThiefX, oldThiefY;
 
-        // Movement  
-        bool knightMovedThisFrame = false;
-        bool witchMovedThisFrame = false;
-        bool thiefMovedThisFrame = false;
+        bool knightMovedThisFrame, witchMovedThisFrame, thiefMovedThisFrame;
 
-        //  Map 
+        // Map
         ColoredText[,] backgroundTiles;
 
-        //  Enemies 
+        // Enemies
         (int x, int y, ColoredText sprite)[] townEnemies;
         (int x, int y, ColoredText sprite)[] forestEnemies;
         (int x, int y, ColoredText sprite)[] castleEnemies;
-
 
         public void Setup()
         {
@@ -47,15 +43,12 @@ namespace MohawkTerminalGame
             SetupEnemies(width, height);
             DrawEnemies();
 
-            // Initialize players at middle-left with vertical offset
-            int middleY = map.Height / 2;
-
-            knightX = 0;
-            knightY = middleY;           // Middle
-            witchX = 0;
-            witchY = middleY - 1;       // One above middle
-            thiefX = 0;
-            thiefY = middleY + 1;       // One below middle
+            // Initialize players at middle-left
+            int middleY = height / 2;
+            knightX = witchX = thiefX = 0;
+            knightY = middleY;
+            witchY = middleY - 1;
+            thiefY = middleY + 1;
 
             oldKnightX = knightX; oldKnightY = knightY;
             oldWitchX = witchX; oldWitchY = witchY;
@@ -66,21 +59,22 @@ namespace MohawkTerminalGame
             DrawCharacter(thiefX, thiefY, thiefChar);
         }
 
-        // Main Loop 
         public void Execute()
         {
             knightMovedThisFrame = witchMovedThisFrame = thiefMovedThisFrame = false;
 
-            Move(ref knightX, ref knightY, ref knightMovedThisFrame, ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
-            Move(ref witchX, ref witchY, ref witchMovedThisFrame, ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D);
-            Move(ref thiefX, ref thiefY, ref thiefMovedThisFrame, ConsoleKey.I, ConsoleKey.K, ConsoleKey.J, ConsoleKey.L);
+            Move(ref knightX, ref knightY, ref knightMovedThisFrame, ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.LeftArrow, ConsoleKey.RightArrow, GetCurrentAreaEnemies(knightX));
+            Move(ref witchX, ref witchY, ref witchMovedThisFrame, ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D, GetCurrentAreaEnemies(witchX));
+            Move(ref thiefX, ref thiefY, ref thiefMovedThisFrame, ConsoleKey.I, ConsoleKey.K, ConsoleKey.J, ConsoleKey.L, GetCurrentAreaEnemies(thiefX));
 
             UpdateCharacter(ref oldKnightX, ref oldKnightY, knightX, knightY, knightChar);
             UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
             UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
         }
 
-        // Map Drawing 
+        // 
+        // Map & Areas
+        // 
         void DrawAreas(int width, int height)
         {
             int third = width / 3;
@@ -89,25 +83,22 @@ namespace MohawkTerminalGame
             {
                 for (int x = 0; x < width; x++)
                 {
-                    ColoredText tile = null;
+                    ColoredText tile;
 
-                    // Town
-                    if (x < third)
+                    if (x < third) // Town
                     {
                         tile = new ColoredText("  ", ConsoleColor.Green, ConsoleColor.Green);
-                        if ((x % 10 == 2 || x % 10 == 7) && (y % 6 == 2)) tile = new ColoredText("🏠", ConsoleColor.Gray, ConsoleColor.Green);
+                        if ((x % 10 == 2 || x % 10 == 7) && y % 6 == 2) tile = new ColoredText("🏠", ConsoleColor.Gray, ConsoleColor.Green);
                         if (y % 6 == 3) tile = new ColoredText("~~", ConsoleColor.Blue, ConsoleColor.DarkBlue);
                         if (y % 6 == 3 && x % 10 == 5) tile = new ColoredText("==", ConsoleColor.Yellow, ConsoleColor.Green);
                     }
-                    // Forest
-                    else if (x < 2 * third)
+                    else if (x < 2 * third) // Forest
                     {
                         tile = new ColoredText("  ", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen);
                         if ((x % 6 == 1 || x % 6 == 4) && (y % 5 == 1 || y % 5 == 3)) tile = new ColoredText("🌲", ConsoleColor.DarkGreen, ConsoleColor.DarkGreen);
                         if ((x % 7 == 3 || x % 7 == 5) && y % 6 == 2) tile = new ColoredText("🌸", ConsoleColor.Magenta, ConsoleColor.DarkGreen);
                     }
-                    // Castle
-                    else
+                    else // Castle
                     {
                         tile = new ColoredText("  ", ConsoleColor.Gray, ConsoleColor.DarkGray);
                         if (y == height - 6) tile = new ColoredText("==", ConsoleColor.Gray, ConsoleColor.DarkGray);
@@ -122,16 +113,21 @@ namespace MohawkTerminalGame
             }
         }
 
-        // Player Movement
-        void Move(ref int x, ref int y, ref bool moved, ConsoleKey up, ConsoleKey down, ConsoleKey left, ConsoleKey right)
+        // 
+        // Characters
+        // 
+        void Move(ref int x, ref int y, ref bool moved, ConsoleKey up, ConsoleKey down, ConsoleKey left, ConsoleKey right, (int x, int y, ColoredText sprite)[] areaEnemies)
         {
             if (moved) return;
+            if (IsNearEnemy(x, y, areaEnemies)) return;
 
             int newX = x, newY = y;
             if (Input.IsKeyPressed(right)) newX++;
             if (Input.IsKeyPressed(left)) newX--;
             if (Input.IsKeyPressed(up)) newY--;
             if (Input.IsKeyPressed(down)) newY++;
+
+            if (!CanMoveTo(newX, newY)) return;
 
             if (newX != x || newY != y)
             {
@@ -141,7 +137,6 @@ namespace MohawkTerminalGame
             }
         }
 
-        // Character Drawing 
         void UpdateCharacter(ref int oldX, ref int oldY, int newX, int newY, ColoredText character)
         {
             if (oldX != newX || oldY != newY)
@@ -154,62 +149,90 @@ namespace MohawkTerminalGame
 
         void DrawCharacter(int x, int y, ColoredText character)
         {
-            ColoredText tile = backgroundTiles[x, y];
+            var tile = backgroundTiles[x, y];
             character.bgColor = tile.bgColor;
             map.Poke(x * 2, y, character);
         }
 
-        void ResetCell(int x, int y)
-        {
-            map.Poke(x * 2, y, backgroundTiles[x, y]);
-        }
+        void ResetCell(int x, int y) => map.Poke(x * 2, y, backgroundTiles[x, y]);
 
-        //  Enemies Setup 
+        // 
+        // Enemies
+        // 
         void SetupEnemies(int width, int height)
         {
-            int townWidth = width / 3;
-            int forestWidth = width / 3;
-            int castleWidth = width / 3;
+            int third = width / 3;
 
-            // Town 😠
             townEnemies = new (int, int, ColoredText)[7]
             {
                 (1, 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
-                (townWidth / 2, 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
-                (townWidth - 2, 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
+                (third / 2, 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
+                (third - 2, 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
                 (2, height - 4, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
-                (townWidth / 3, height - 3, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
-                (townWidth - 3, height - 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
-                (townWidth / 2, height / 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green))
+                (third / 3, height - 3, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
+                (third - 3, height - 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green)),
+                (third / 2, height / 2, new ColoredText("😠", ConsoleColor.Red, ConsoleColor.Green))
             };
 
-            // Forest 😡
             forestEnemies = new (int, int, ColoredText)[9]
             {
-                (townWidth + 2, 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (townWidth + townWidth / 3, 3, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (2 * townWidth - 2, 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (townWidth + 1, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (townWidth + townWidth / 2, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (2 * townWidth - 2, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (townWidth + 2, height - 4, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (townWidth + townWidth / 2, height - 3, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
-                (2 * townWidth - 3, height - 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen))
+                (third + 2, 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (third + third / 3, 3, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (2 * third - 2, 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (third + 1, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (third + third / 2, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (2 * third - 2, height / 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (third + 2, height - 4, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (third + third / 2, height - 3, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen)),
+                (2 * third - 3, height - 2, new ColoredText("😡", ConsoleColor.Red, ConsoleColor.DarkGreen))
             };
 
-            // Castle 😈 (Boss)
-            int castleStart = 2 * townWidth;
             castleEnemies = new (int, int, ColoredText)[1]
             {
-                (castleStart + castleWidth / 2, height - 6, new ColoredText("😈", ConsoleColor.Red, ConsoleColor.DarkGray))
+                (2 * third + third / 2, height - 6, new ColoredText("😈", ConsoleColor.Red, ConsoleColor.DarkGray))
             };
         }
 
         void DrawEnemies()
         {
-            foreach (var (x, y, sprite) in townEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
-            foreach (var (x, y, sprite) in forestEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
-            foreach (var (x, y, sprite) in castleEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
+            foreach (var (x, y, sprite) in townEnemies) backgroundTiles[x, y] = sprite;
+            foreach (var (x, y, sprite) in forestEnemies) backgroundTiles[x, y] = sprite;
+            foreach (var (x, y, sprite) in castleEnemies) backgroundTiles[x, y] = sprite;
+
+            for (int y = 0; y < map.Height; y++)
+                for (int x = 0; x < map.Width; x++)
+                    map.Poke(x * 2, y, backgroundTiles[x, y]);
+        }
+
+        // 
+        // Enemy & Barrier Logic
+        // 
+        bool IsNearEnemy(int x, int y, (int x, int y, ColoredText sprite)[] enemies)
+        {
+            foreach (var (ex, ey, _) in enemies)
+                if (Math.Abs(x - ex) <= 1 && Math.Abs(y - ey) <= 1) return true;
+            return false;
+        }
+
+        bool AreEnemiesDefeated((int x, int y, ColoredText sprite)[] enemies) => enemies.Length == 0;
+
+        bool CanMoveTo(int x, int y)
+        {
+            int third = map.Width / 3;
+
+            if (x == third && !AreEnemiesDefeated(townEnemies)) return false;
+            if ((x == third - 1 && !AreEnemiesDefeated(townEnemies)) || (x == 2 * third && !AreEnemiesDefeated(forestEnemies))) return false;
+            if (x == 2 * third - 1 && !AreEnemiesDefeated(forestEnemies)) return false;
+
+            return true;
+        }
+
+        (int x, int y, ColoredText sprite)[] GetCurrentAreaEnemies(int x)
+        {
+            int third = map.Width / 3;
+            if (x < third) return townEnemies;
+            if (x < 2 * third) return forestEnemies;
+            return castleEnemies;
         }
     }
 }
