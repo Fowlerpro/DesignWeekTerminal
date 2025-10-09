@@ -11,33 +11,42 @@ public static class RandomCards
     public static string cardCommand = "";
     public static bool mapClear = false;
     public static bool enemyDead = false;
-
+    public static bool hasGoldenIdol = false;
+    static bool goldenIdolUsed = false;
 
     public static void cardMoves(string cardCommand)
     {
         
-        if (inCombatMode)
-        {
+            
             if (!enemyDead)
             {
                 enemyHealth = 20;
-                Console.WriteLine("Enter a code from a card!");
                 enemyDead = true;
                 mapClear = true;
             }
             else
             {
-                Terminal.WriteLine($"Enemy has {enemyHealth} Health");
-                Console.WriteLine("Enter a code from a card!");
                 switch (cardCommand)//expandable switch statment for all card abilities
                 {
                     case "atk1":
                         enemyHealth -= 1;
-                        Terminal.WriteLine("you attacked the enemy");
+                        Terminal.WriteLine($"You attacked the enemy, Enemy has {enemyHealth} Health");
                         takenDamage = true;
                         break;
+                case "gdl":
+                    if (!goldenIdolUsed)
+                    {
+                        hasGoldenIdol = true;
+                        Terminal.WriteLine("You have gained an extra life");
+                        goldenIdolUsed = true;
+                    }
+                    else
+                    {
+                        Terminal.WriteLine("Card already Used");
+                    }
+                        break;
 
-                    default:
+                default:
                         Terminal.WriteLine("Invalid Card Code");
                         Terminal.Beep();
                         break;
@@ -46,7 +55,7 @@ public static class RandomCards
             }
         }
     }
-}
+
 
 
 

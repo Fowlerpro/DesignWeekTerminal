@@ -67,37 +67,47 @@ public class TerminalGame
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
     {//Starts the game if player hits the spacebar
-            DrawEnemies();
-            Reload();
-            DrawCharacter(witchX, witchY, witchChar);
+        DrawEnemies();
+        Reload();
+        DrawCharacter(witchX, witchY, witchChar);
 
 
         playerMovedThisFrame = false;
-            UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
-            
+        UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
 
-            string input = Terminal.ReadLine();
 
-            if (!string.IsNullOrEmpty(input))
-            {//?.Trim gets rid of extra spaces and .ToLower makes all inputs automatically lowercase
+        string input = Terminal.ReadLine();
+
+        if (!string.IsNullOrEmpty(input))
+        {//?.Trim gets rid of extra spaces and .ToLower makes all inputs automatically lowercase
             if (!RandomCards.inCombatMode)
             {
                 command = input.Trim().ToLower();
                 typedCommands(command);
             }
-            else 
+            else
             {
                 RandomCards.cardCommand = input.Trim().ToLower();
-                RandomCards.cardMoves(RandomCards.cardCommand); }
+                RandomCards.cardMoves(RandomCards.cardCommand);
             }
-
-                if (RandomCards.playerHealth <= 0)
+        }
+        if (!RandomCards.hasGoldenIdol)
+        {
+            if (RandomCards.playerHealth <= 0)
             {
                 RandomCards.inCombatMode = false;
                 intro();
                 Setup();
                 startGame = false;
                 RandomCards.playerHealth = 40;
+            }
+            else
+            {
+                if (RandomCards.playerHealth <= 0)
+                {
+                    RandomCards.playerHealth = 40;
+                    RandomCards.hasGoldenIdol = false;
+                }
             }// if player health falls to zero the title screen is displayed and player health is reset
 
             if (RandomCards.playerHealth >= 41)
@@ -108,18 +118,22 @@ public class TerminalGame
             if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
             {
                 RandomCards.inCombatMode = false;
-                //Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
                 Console.WriteLine("Enemy Defeated");
                 playerAbilites = 4;
             }
             if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
             {
                 RandomCards.playerHealth -= enemyDamage;
-                Console.WriteLine("The enemy has attacked you");
-                Console.WriteLine($"You have {RandomCards.playerHealth} health left");
+                Console.WriteLine($"The enemy has attacked you,You have {RandomCards.playerHealth} health left");
                 RandomCards.takenDamage = false;
             }
+            if (RandomCards.inCombatMode)
+            {
+                Console.WriteLine("Enter a code from a card!");
+
+            }
         }
+    }
     public void typedCommands(string command)
     {
         Terminal.Clear();
