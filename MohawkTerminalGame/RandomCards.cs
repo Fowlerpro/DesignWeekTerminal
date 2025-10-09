@@ -8,29 +8,42 @@ public static class RandomCards
     public static bool takenDamage = false;
     public static bool inCombatMode = false;
     public static int playerAbilites = 4;
+    public static string cardCommand = "";
+    public static bool mapClear = false;
+    public static bool enemyDead = false;
 
-    public static void cardMoves()
+
+    public static void cardMoves(string cardCommand)
     {
+        
         if (inCombatMode)
         {
-            enemyHealth = 20;
-            Console.WriteLine($"inCombatMode is {inCombatMode}");
-
-            string input = Terminal.ReadLine()?.Trim().ToLower();
-            switch (input)//expandable switch statment for all card abilities
+            if (!enemyDead)
             {
-                case "atk1":
-                    enemyHealth -= 1;
-                    Terminal.WriteLine("you attacked the enemy");
-                    Terminal.WriteLine($"Enemy has {enemyHealth} Health");
-                    takenDamage = true;
-                    break;
-
-                default:
-                    Terminal.WriteLine("Invalid Card Code");
-                    break;
+                enemyHealth = 20;
+                Console.WriteLine("Enter a code from a card!");
+                enemyDead = true;
+                mapClear = true;
             }
+            else
+            {
+                Terminal.WriteLine($"Enemy has {enemyHealth} Health");
+                Console.WriteLine("Enter a code from a card!");
+                switch (cardCommand)//expandable switch statment for all card abilities
+                {
+                    case "atk1":
+                        enemyHealth -= 1;
+                        Terminal.WriteLine("you attacked the enemy");
+                        takenDamage = true;
+                        break;
 
+                    default:
+                        Terminal.WriteLine("Invalid Card Code");
+                        Terminal.Beep();
+                        break;
+                }
+                
+            }
         }
     }
 }

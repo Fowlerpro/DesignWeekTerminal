@@ -29,7 +29,8 @@ public class TerminalGame
     public bool startGame = false;
     public int playerAbilites = 4;//number of ability points per round
     string command = "";// empty string variable to be used in the command function
-
+    public int width = Console.WindowWidth / 2;
+    public int height = Console.WindowHeight;
     public void Setup()
     {
 
@@ -37,13 +38,12 @@ public class TerminalGame
         Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
         Program.TargetFPS = 60;
         Terminal.CursorVisible = false;
+        Terminal.SetCursorPosition(0, 0);
 
         Terminal.SetTitle("Tales from the Past");
         intro();
-        RandomCards.cardMoves();
 
-        int width = Console.WindowWidth / 2;
-        int height = Console.WindowHeight;
+        
 
         map = new TerminalGridWithColor(width, height, new ColoredText("  ", ConsoleColor.Black, ConsoleColor.Black));
         backgroundTiles = new ColoredText[width, height];
@@ -56,8 +56,8 @@ public class TerminalGame
         
         oldWitchX = witchX; oldWitchY = witchY;
         DrawAreas(width, height);
-        DrawCharacter(witchX, witchY, witchChar);
         SetupEnemies(width, height);
+        Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
     }
 
     // Execute() runs based on Program.TerminalExecuteMode (assign to it in Setup).
@@ -67,30 +67,35 @@ public class TerminalGame
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
     {//Starts the game if player hits the spacebar
-        if (!startGame)
-        {
-
-
-            startGame = true;
             DrawEnemies();
+            Reload();
+            DrawCharacter(witchX, witchY, witchChar);
 
 
-
-            playerMovedThisFrame = false;
+        playerMovedThisFrame = false;
             UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
-            Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
+            
 
             string input = Terminal.ReadLine();
 
             if (!string.IsNullOrEmpty(input))
             {//?.Trim gets rid of extra spaces and .ToLower makes all inputs automatically lowercase
+            if (!RandomCards.inCombatMode)
+            {
                 command = input.Trim().ToLower();
                 typedCommands(command);
+            }
+            else 
+            {
+                RandomCards.cardCommand = input.Trim().ToLower();
+                RandomCards.cardMoves(RandomCards.cardCommand); }
             }
 
                 if (RandomCards.playerHealth <= 0)
             {
+                RandomCards.inCombatMode = false;
                 intro();
+                Setup();
                 startGame = false;
                 RandomCards.playerHealth = 40;
             }// if player health falls to zero the title screen is displayed and player health is reset
@@ -115,9 +120,10 @@ public class TerminalGame
                 RandomCards.takenDamage = false;
             }
         }
-    }
     public void typedCommands(string command)
     {
+        Terminal.Clear();
+        DrawAreas(width, height);
         switch (command)
         {
             case "w":
@@ -125,13 +131,16 @@ public class TerminalGame
                 Terminal.WriteLine("Player moved up");
                 break;
             case "s":
-
+                witchY = Math.Max(0, witchY + 1);
+                Terminal.WriteLine("Player moved down");
                 break;
             case "a":
-
+                witchX = Math.Max(0, witchX - 1);
+                Terminal.WriteLine("Player moved left");
                 break;
             case "d":
-
+                witchX = Math.Max(0, witchX +1);
+                Terminal.WriteLine("Player moved right");
                 break;
             case "kill":
                 Terminal.WriteLine("Player was killed via command");
@@ -158,29 +167,21 @@ public class TerminalGame
                 }//command to enter combat
                 break;
                 default:
-                Terminal.WriteLine($"Unknown command: {command}");
+                Terminal.WriteLine("Invalid Command");
                 Terminal.Beep();
                 break;
 
         }
     }
-    // Player Movement
-    void Move(ref int x, ref int y, ref bool moved, ConsoleKey up, ConsoleKey down, ConsoleKey left, ConsoleKey right)
+    public void Reload()
     {
-        if (moved) return;
-
-        int newX = x, newY = y;
-        if (Input.IsKeyPressed(right)) newX++;
-        if (Input.IsKeyPressed(left)) newX--;
-        if (Input.IsKeyPressed(up)) newY--;
-        if (Input.IsKeyPressed(down)) newY++;
-
-        if (newX != x || newY != y)
+        if (RandomCards.mapClear)
         {
-            x = Math.Clamp(newX, 0, map.Width - 1);
-            y = Math.Clamp(newY, 0, map.Height - 1);
-            moved = true;
+            
+            Terminal.Clear();
+            DrawAreas(width, height);
         }
+        RandomCards.mapClear = false;
     }
     // Character Drawing 
     public void UpdateCharacter(ref int oldX, ref int oldY, int newX, int newY, ColoredText character)
