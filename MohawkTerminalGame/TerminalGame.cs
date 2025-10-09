@@ -318,6 +318,36 @@ public class TerminalGame
     }
     public void intro()
     {//Starting title screen
+        Terminal.WriteLine("Type W to start playing!");
+    }
+    // 
+    // Enemy & Barrier Logic
+    // 
+    bool IsNearEnemy(int x, int y, (int x, int y, ColoredText sprite)[] enemies)
+    {
+        foreach (var (ex, ey, _) in enemies)
+            if (Math.Abs(x - ex) <= 1 && Math.Abs(y - ey) <= 1) return true;
+        return false;
+    }
 
+    bool AreEnemiesDefeated((int x, int y, ColoredText sprite)[] enemies) => enemies.Length == 0;
+
+    bool CanMoveTo(int x, int y)
+    {
+        int third = map.Width / 3;
+
+        if (x == third && !AreEnemiesDefeated(townEnemies)) return false;
+        if ((x == third - 1 && !AreEnemiesDefeated(townEnemies)) || (x == 2 * third && !AreEnemiesDefeated(forestEnemies))) return false;
+        if (x == 2 * third - 1 && !AreEnemiesDefeated(forestEnemies)) return false;
+
+        return true;
+    }
+
+    (int x, int y, ColoredText sprite)[] GetCurrentAreaEnemies(int x)
+    {
+        int third = map.Width / 3;
+        if (x < third) return townEnemies;
+        if (x < 2 * third) return forestEnemies;
+        return castleEnemies;
     }
 }
