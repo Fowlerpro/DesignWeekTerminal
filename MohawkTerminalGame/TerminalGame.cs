@@ -13,8 +13,8 @@ public class TerminalGame
     TerminalGridWithColor map;
 
     // Characters
-    ColoredText witchChar = new(@"⚔", ConsoleColor.Magenta, ConsoleColor.Magenta);
-   public int witchX, witchY, oldWitchX, oldWitchY;
+    ColoredText playerChar = new(@"⚔", ConsoleColor.Magenta, ConsoleColor.Magenta);
+   public int playerX, playerY, oldplayerX, oldplayerY;
     //Varaibles
     public bool playerMovedThisFrame = false;
 
@@ -25,9 +25,11 @@ public class TerminalGame
     (int x, int y, ColoredText sprite)[] townEnemies;
     (int x, int y, ColoredText sprite)[] forestEnemies;
     (int x, int y, ColoredText sprite)[] castleEnemies;
-    public int enemyDamage = Random.Integer(1, 6);// Random generator from 1-5 to cause damage to the player
+    public int enemyDamage = Random.Integer(2, 8);// Random generator from 2-7 to cause damage to the player
+    public int majorEnemyDamage = Random.Integer(5, 20);// Random generator from 5-19 to cause damage to the player
+    public int bossEnemyDamage = Random.Integer(10, 26);//Random generator from 10-25 to cause damage to the player
     public bool startGame = false;
-    public int playerAbilites = 4;//number of ability points per round
+
     string command = "";// empty string variable to be used in the command function
     public int width = Console.WindowWidth / 2;
     public int height = Console.WindowHeight;
@@ -51,10 +53,10 @@ public class TerminalGame
         
 
         // Initialize players at bottom-left
-        witchX = 0;
-        witchY = height - 1;
+        playerX = 0;
+        playerY = height - 1;
         
-        oldWitchX = witchX; oldWitchY = witchY;
+        oldplayerX = playerX; oldplayerY = playerY;
         DrawAreas(width, height);
         SetupEnemies(width, height);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
@@ -69,11 +71,11 @@ public class TerminalGame
     {//Starts the game if player hits the spacebar
         DrawEnemies();
         Reload();
-        DrawCharacter(witchX, witchY, witchChar);
+        DrawCharacter(playerX, playerY, playerChar);
 
 
         playerMovedThisFrame = false;
-        UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
+        UpdateCharacter(ref oldplayerX, ref oldplayerY, playerX, playerY, playerChar);
 
 
         string input = Terminal.ReadLine();
@@ -119,7 +121,7 @@ public class TerminalGame
             {
                 RandomCards.inCombatMode = false;
                 Console.WriteLine("Enemy Defeated");
-                playerAbilites = 4;
+                RandomCards.playerMana += 25;
             }
             if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
             {
@@ -129,6 +131,7 @@ public class TerminalGame
             }
             if (RandomCards.inCombatMode)
             {
+                Console.WriteLine($"you have {RandomCards.playerMana} mana left");
                 Console.WriteLine("Enter a code from a card!");
 
             }
@@ -141,19 +144,19 @@ public class TerminalGame
         switch (command)
         {
             case "w":
-                witchY = Math.Max(0, witchY - 1);
+                playerY = Math.Max(0, playerY - 1);
                 Terminal.WriteLine("Player moved up");
                 break;
             case "s":
-                witchY = Math.Max(0, witchY + 1);
+                playerY = Math.Max(0, playerY + 1);
                 Terminal.WriteLine("Player moved down");
                 break;
             case "a":
-                witchX = Math.Max(0, witchX - 1);
+                playerX = Math.Max(0, playerX - 1);
                 Terminal.WriteLine("Player moved left");
                 break;
             case "d":
-                witchX = Math.Max(0, witchX +1);
+                playerX = Math.Max(0, playerX +1);
                 Terminal.WriteLine("Player moved right");
                 break;
             case "kill":
@@ -193,6 +196,7 @@ public class TerminalGame
                 break;
 
         }
+        var currentEnemies = GetCurrentAreaEnemies(playerX);
     }
     public void Reload()
     {
