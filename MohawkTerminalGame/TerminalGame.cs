@@ -1,5 +1,6 @@
 ﻿using DefaultNamespace;
 using System;
+using System.Text;
 
 namespace MohawkTerminalGame
 {
@@ -25,6 +26,12 @@ namespace MohawkTerminalGame
         (int x, int y, ColoredText sprite)[] forestEnemies;
         (int x, int y, ColoredText sprite)[] castleEnemies;
 
+        // Text box
+        StringBuilder textBoxInput = new();
+        int mapHeight;
+        int textBoxTop;
+        bool isTypingMode = false; // ✅ typing mode toggle
+
         public void Setup()
         {
             Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteTime;
@@ -34,17 +41,18 @@ namespace MohawkTerminalGame
             Terminal.CursorVisible = false;
 
             int width = Console.WindowWidth / 2;
-            int height = Console.WindowHeight;
+            mapHeight = (int)(Console.WindowHeight * 0.75); // 75% map
+            textBoxTop = mapHeight;
 
-            map = new TerminalGridWithColor(width, height, new ColoredText("  ", ConsoleColor.Black, ConsoleColor.Black));
-            backgroundTiles = new ColoredText[width, height];
+            map = new TerminalGridWithColor(width, mapHeight, new ColoredText("  ", ConsoleColor.Black, ConsoleColor.Black));
+            backgroundTiles = new ColoredText[width, mapHeight];
 
-            DrawAreas(width, height);
-            SetupEnemies(width, height);
+            DrawAreas(width, mapHeight);
+            SetupEnemies(width, mapHeight);
             DrawEnemies();
 
             // Initialize players at middle-left
-            int middleY = height / 2;
+            int middleY = mapHeight / 2;
             knightX = witchX = thiefX = 0;
             knightY = middleY;
             witchY = middleY - 1;
@@ -57,10 +65,28 @@ namespace MohawkTerminalGame
             DrawCharacter(knightX, knightY, knightChar);
             DrawCharacter(witchX, witchY, witchChar);
             DrawCharacter(thiefX, thiefY, thiefChar);
+
+            DrawTextBox();
         }
 
         public void Execute()
         {
+            // ✅ Toggle typing mode with T key
+            if (Input.IsKeyPressed(ConsoleKey.T))
+            {
+                isTypingMode = !isTypingMode;
+                Console.SetCursorPosition(0, textBoxTop + 1);
+                Console.WriteLine(isTypingMode ? "[Typing mode enabled]" : "[Typing mode disabled]");
+                DrawTextBox();
+            }
+
+            if (isTypingMode)
+            {
+                HandleTextBoxInput();
+                return; // stop movement while typing
+            }
+
+            // Normal movement/gameplay
             knightMovedThisFrame = witchMovedThisFrame = thiefMovedThisFrame = false;
 
             Move(ref knightX, ref knightY, ref knightMovedThisFrame, ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.LeftArrow, ConsoleKey.RightArrow, GetCurrentAreaEnemies(knightX));
@@ -72,9 +98,7 @@ namespace MohawkTerminalGame
             UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
         }
 
-        // 
-        // Map & Areas
-        // 
+        //  MAP DRAWING 
         void DrawAreas(int width, int height)
         {
             int third = width / 3;
@@ -113,9 +137,7 @@ namespace MohawkTerminalGame
             }
         }
 
-        // 
-        // Characters
-        // 
+        // CHARACTER CONTROL 
         void Move(ref int x, ref int y, ref bool moved, ConsoleKey up, ConsoleKey down, ConsoleKey left, ConsoleKey right, (int x, int y, ColoredText sprite)[] areaEnemies)
         {
             if (moved) return;
@@ -156,9 +178,7 @@ namespace MohawkTerminalGame
 
         void ResetCell(int x, int y) => map.Poke(x * 2, y, backgroundTiles[x, y]);
 
-        // 
-        // Enemies
-        // 
+        // ENEMIES 
         void SetupEnemies(int width, int height)
         {
             int third = width / 3;
@@ -204,9 +224,7 @@ namespace MohawkTerminalGame
                     map.Poke(x * 2, y, backgroundTiles[x, y]);
         }
 
-        // 
-        // Enemy & Barrier Logic
-        // 
+        //  ENEMY & BARRIERS 
         bool IsNearEnemy(int x, int y, (int x, int y, ColoredText sprite)[] enemies)
         {
             foreach (var (ex, ey, _) in enemies)
@@ -234,6 +252,62 @@ namespace MohawkTerminalGame
             if (x < 2 * third) return forestEnemies;
             return castleEnemies;
         }
+
+        // TEXT BOX 
+        void DrawTextBox()
+        {
+            Console.SetCursorPosition(0, textBoxTop);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            int width = Console.WindowWidth;
+            int height = Console.WindowHeight - textBoxTop;
+
+            for (int i = 0; i < height; i++)
+            {
+                Console.SetCursorPosition(0, textBoxTop + i);
+                Console.Write(new string(' ', width));
+            }
+
+            Console.SetCursorPosition(0, textBoxTop);
+            Console.WriteLine(new string('═', width));
+            Console.Write(" > ");
+            Console.ResetColor();
+        }
+
+        void HandleTextBoxInput()
+        {
+            while (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    string text = textBoxInput.ToString();
+                    textBoxInput.Clear();
+
+                    Console.SetCursorPosition(0, textBoxTop + 1);
+                    Console.WriteLine("You entered: " + text.PadRight(Console.WindowWidth - 12));
+                    Console.SetCursorPosition(3, textBoxTop);
+                    Console.Write(new string(' ', Console.WindowWidth - 3));
+                    Console.SetCursorPosition(3, textBoxTop);
+                }
+                else if (key.Key == ConsoleKey.Backspace && textBoxInput.Length > 0)
+                {
+                    textBoxInput.Remove(textBoxInput.Length - 1, 1);
+                    Console.SetCursorPosition(3 + textBoxInput.Length, textBoxTop);
+                    Console.Write(' ');
+                    Console.SetCursorPosition(3 + textBoxInput.Length, textBoxTop);
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    textBoxInput.Append(key.KeyChar);
+                    Console.SetCursorPosition(3 + textBoxInput.Length - 1, textBoxTop);
+                    Console.Write(key.KeyChar);
+                }
+            }
+        }
     }
 }
-    //STRONGLY RECOMMEND MOVING THE CHARACTERS PRESSING THE HOTKEY ONCE, NOT HOLDING IT AS IT MAY CAUSE BUGS.
+
+// STRONGLY RECOMMENDED: press movement keys once, not hold them, to avoid input bugs.
