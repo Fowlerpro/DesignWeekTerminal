@@ -34,7 +34,7 @@ public static class RandomCards
 
                 switch (cardCommand)//expandable switch statment for all card abilities
                 {
-                    case "atk1"://basic attack
+                    case "atk"://basic attack
                         enemyHealth -= 5;
                         majorEnemyHealth -= 5;
                         bossEnemyHealth -= 5;
