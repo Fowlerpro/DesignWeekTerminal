@@ -180,7 +180,14 @@ public class TerminalGame
                     RandomCards.inCombatMode = true;
                 }//command to enter combat
                 break;
-                default:
+            case "damage":
+                {
+                    RandomCards.playerHealth -= enemyDamage;
+                    Console.WriteLine($"The enemy has attacked you,You have {RandomCards.playerHealth} health left");
+                    RandomCards.takenDamage = false;//command to test the enemy damage function
+                }
+                break;
+            default:
                 Terminal.WriteLine("Invalid Command");
                 Terminal.Beep();
                 break;
