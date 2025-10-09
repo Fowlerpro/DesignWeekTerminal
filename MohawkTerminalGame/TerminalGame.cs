@@ -13,16 +13,10 @@ public class TerminalGame
     TerminalGridWithColor map;
 
     // Characters
-    ColoredText knightChar = new(@"⚔", ConsoleColor.DarkGray, ConsoleColor.DarkGray);
-    public int knightX, knightY, oldKnightX, oldKnightY;
     ColoredText witchChar = new(@"⚔", ConsoleColor.Magenta, ConsoleColor.Magenta);
    public int witchX, witchY, oldWitchX, oldWitchY;
-    ColoredText thiefChar = new(@"⚔", ConsoleColor.DarkRed, ConsoleColor.DarkRed);
-   public int thiefX, thiefY, oldThiefX, oldThiefY;
     //Varaibles
-    public bool knightMovedThisFrame = false;
-    public bool witchMovedThisFrame = false;
-   public bool thiefMovedThisFrame = false;
+    public bool playerMovedThisFrame = false;
 
     //  Map 
     ColoredText[,] backgroundTiles;
@@ -34,12 +28,13 @@ public class TerminalGame
     public int enemyDamage = Random.Integer(1, 6);// Random generator from 1-5 to cause damage to the player
     public bool startGame = false;
     public int playerAbilites = 4;//number of ability points per round
+    string command = "";// empty string variable to be used in the command function
 
     public void Setup()
     {
 
         Program.TerminalExecuteMode = TerminalExecuteMode.ExecuteTime;
-        Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+        Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
         Program.TargetFPS = 60;
         Terminal.CursorVisible = false;
 
@@ -56,16 +51,12 @@ public class TerminalGame
         
 
         // Initialize players at bottom-left
-        knightX = witchX = thiefX = 0;
-        knightY = witchY = thiefY = height - 1;
-        oldKnightX = knightX; oldKnightY = knightY;
+        witchX = 0;
+        witchY = height - 1;
+        
         oldWitchX = witchX; oldWitchY = witchY;
-        oldThiefX = thiefX; oldThiefY = thiefY;
-
-        DrawCharacter(knightX, knightY, knightChar);
-        DrawCharacter(witchX, witchY, witchChar);
-        DrawCharacter(thiefX, thiefY, thiefChar);
         DrawAreas(width, height);
+        DrawCharacter(witchX, witchY, witchChar);
         SetupEnemies(width, height);
     }
 
@@ -78,68 +69,99 @@ public class TerminalGame
     {//Starts the game if player hits the spacebar
         if (!startGame)
         {
-            if (Input.IsKeyPressed(ConsoleKey.M))
-            {
-                startGame = true;
-                knightMovedThisFrame = witchMovedThisFrame = thiefMovedThisFrame = false;
 
-                
 
-                
-                
-                DrawEnemies();
+            startGame = true;
+            DrawEnemies();
+
+
+
+            playerMovedThisFrame = false;
+            UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
+            Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
+
+            string input = Terminal.ReadLine();
+
+            if (!string.IsNullOrEmpty(input))
+            {//?.Trim gets rid of extra spaces and .ToLower makes all inputs automatically lowercase
+                command = input.Trim().ToLower();
+                typedCommands(command);
             }
 
+                if (RandomCards.playerHealth <= 0)
+            {
+                intro();
+                startGame = false;
+                RandomCards.playerHealth = 40;
+            }// if player health falls to zero the title screen is displayed and player health is reset
+
+            if (RandomCards.playerHealth >= 41)
+            {
+                RandomCards.playerHealth = 40;
+                Console.WriteLine("Health is at Max");
+            }
+            if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
+            {
+                RandomCards.inCombatMode = false;
+                //Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
+                Console.WriteLine("Enemy Defeated");
+                playerAbilites = 4;
+            }
+            if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
+            {
+                RandomCards.playerHealth -= enemyDamage;
+                Console.WriteLine("The enemy has attacked you");
+                Console.WriteLine($"You have {RandomCards.playerHealth} health left");
+                RandomCards.takenDamage = false;
+            }
         }
-        UpdateCharacter(ref oldKnightX, ref oldKnightY, knightX, knightY, knightChar);
-        UpdateCharacter(ref oldWitchX, ref oldWitchY, witchX, witchY, witchChar);
-        UpdateCharacter(ref oldThiefX, ref oldThiefY, thiefX, thiefY, thiefChar);
-        Move(ref knightX, ref knightY, ref knightMovedThisFrame, ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
-        Move(ref witchX, ref witchY, ref witchMovedThisFrame, ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D);
-        Move(ref thiefX, ref thiefY, ref thiefMovedThisFrame, ConsoleKey.I, ConsoleKey.K, ConsoleKey.J, ConsoleKey.L);
-        if (RandomCards.playerHealth <= 0)
+    }
+    public void typedCommands(string command)
+    {
+        switch (command)
         {
-            intro();
-            startGame = false;
-            RandomCards.playerHealth = 40;
-        }// if player health falls to zero the title screen is displayed and player health is reset
-        //
-        //
-        //
-        if (Input.IsKeyPressed(ConsoleKey.G))
-        {
-            RandomCards.playerHealth -= 40;
-        }//debug Keybing to kill the player to test reset mechanic
-        if (Input.IsKeyPressed(ConsoleKey.B))
-        {
-            RandomCards.playerHealth += 40;
-            Console.WriteLine(RandomCards.playerHealth);
-        }//debug Keybing to reset play health when they go above 40
-        if (RandomCards.playerHealth >= 41)
-        {
-            RandomCards.playerHealth = 40;
-            Console.WriteLine("trying to reset");
-        }
-        if (Input.IsKeyPressed(ConsoleKey.H) && !RandomCards.inCombatMode)
-        {
-            RandomCards.inCombatMode = true;
-        }//debug to enter combat mode
-        //
-        //Debug Commands
-        //
-        if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
-        {
-            RandomCards.inCombatMode = false;
-            //Program.TerminalInputMode = TerminalInputMode.EnableInputDisableReadLine;
-            Console.WriteLine("Enemy Defeated");
-            playerAbilites = 4;
-        }
-        if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
-        {
-            RandomCards.playerHealth -= enemyDamage;
-            Console.WriteLine("The enemy has attacked you");
-            Console.WriteLine($"You have {RandomCards.playerHealth} health left");
-            RandomCards.takenDamage = false;
+            case "w":
+                witchY = Math.Max(0, witchY - 1);
+                Terminal.WriteLine("Player moved up");
+                break;
+            case "s":
+
+                break;
+            case "a":
+
+                break;
+            case "d":
+
+                break;
+            case "kill":
+                Terminal.WriteLine("Player was killed via command");
+                RandomCards.playerHealth -= 40;
+                Terminal.WriteLine($"player health is currently {RandomCards.playerHealth}");
+                break;//debug command to kill the player to test reset mechanic
+            case "heal":
+                Terminal.WriteLine("Player was healed via command");
+                RandomCards.playerHealth += 40;
+                Terminal.WriteLine($"player health is currently {RandomCards.playerHealth}");
+                break;//debug command to heal the player
+            case "health":
+                Terminal.WriteLine("checking player health");
+                Terminal.WriteLine($"player health is currently {RandomCards.playerHealth}");
+                break;//debug command to see the health of the player
+            case "help":
+                Terminal.WriteLine("Commands: w, a, s, d, heal, kill, health, help");
+                break;//debug command to see all commands
+            case "combat":
+                if (!RandomCards.inCombatMode)
+                {
+                    Terminal.WriteLine("Player has entered combat mode");
+                    RandomCards.inCombatMode = true;
+                }//command to enter combat
+                break;
+                default:
+                Terminal.WriteLine($"Unknown command: {command}");
+                Terminal.Beep();
+                break;
+
         }
     }
     // Player Movement
