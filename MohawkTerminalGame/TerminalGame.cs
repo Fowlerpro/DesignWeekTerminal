@@ -32,7 +32,7 @@ public class TerminalGame
 
     string command = "";// empty string variable to be used in the command function
     public int width = Console.WindowWidth / 2;
-    public int height = Console.WindowHeight;
+    public int height = Console.WindowHeight - 6;
     public void Setup()
     {
 
@@ -55,10 +55,10 @@ public class TerminalGame
         // Initialize players at bottom-left
         playerX = 0;
         playerY = height - 1;
-        
-        oldplayerX = playerX; oldplayerY = playerY;
-        DrawAreas(width, height);
         SetupEnemies(width, height);
+        oldplayerX = playerX; oldplayerY = playerY;
+        Terminal.Clear();
+        DrawAreas(width, height);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
     }
 
@@ -69,9 +69,11 @@ public class TerminalGame
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
     {//Starts the game if player hits the spacebar
-        DrawEnemies();
-        Reload();
+        
+        //Terminal.Clear();
+        //DrawAreas(width, height);
         DrawCharacter(playerX, playerY, playerChar);
+        DrawEnemies();
 
 
         playerMovedThisFrame = false;
@@ -89,6 +91,8 @@ public class TerminalGame
             }
             else
             {
+                //Terminal.Clear();
+                //DrawAreas(width, height);
                 RandomCards.cardCommand = input.Trim().ToLower();
                 RandomCards.cardMoves(RandomCards.cardCommand);
             }
@@ -112,10 +116,15 @@ public class TerminalGame
                 }
             }// if player health falls to zero the title screen is displayed and player health is reset
 
-            if (RandomCards.playerHealth >= 41)
+            if (RandomCards.playerHealth >= 101)
             {
-                RandomCards.playerHealth = 40;
+                RandomCards.playerHealth = 100;
                 Console.WriteLine("Health is at Max");
+            }
+            if (RandomCards.playerMana >= 101)
+            {
+                RandomCards.playerHealth = 100;
+                Console.WriteLine("Mana is at Max");
             }
             if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
             {
@@ -139,9 +148,7 @@ public class TerminalGame
     }
     public void typedCommands(string command)
     {
-        Terminal.Clear();
-        DrawAreas(width, height);
-        switch (command)
+       switch(command)
         {
             case "w":
                 playerY = Math.Max(0, playerY - 1);
@@ -156,7 +163,7 @@ public class TerminalGame
                 Terminal.WriteLine("Player moved left");
                 break;
             case "d":
-                playerX = Math.Max(0, playerX +1);
+                playerX = Math.Max(0, playerX + 1);
                 Terminal.WriteLine("Player moved right");
                 break;
             case "kill":
@@ -179,6 +186,7 @@ public class TerminalGame
             case "combat":
                 if (!RandomCards.inCombatMode)
                 {
+                    RandomCards.enemyHealth = 20;
                     Terminal.WriteLine("Player has entered combat mode");
                     RandomCards.inCombatMode = true;
                 }//command to enter combat
@@ -196,6 +204,8 @@ public class TerminalGame
                 break;
 
         }
+        Terminal.Clear();
+        DrawAreas(width, height);
         var currentEnemies = GetCurrentAreaEnemies(playerX);
     }
     public void Reload()
