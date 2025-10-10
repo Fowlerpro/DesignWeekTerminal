@@ -5,9 +5,6 @@ public static class RandomCards
 {
     public static int locationHealth = 1;
     public static int enemyHealth = locationHealth;// health of every single enemy
-    public static int minorEnemyHealth = 25;// health of every single enemy
-    public static int bossEnemyHealth = 200;
-    public static int majorEnemyHealth = 40;// health of every single enemy
     public static int playerHealth = 100;//this is the player health change this to make the game easier or harder
     public static bool takenDamage = false;
     public static bool inCombatMode = false;
@@ -26,7 +23,6 @@ public static class RandomCards
         {
             if (!enemyDead)
             {
-                locationHealth = minorEnemyHealth;
                 enemyHealth = locationHealth;
                 enemyDead = true;
             }
@@ -40,15 +36,14 @@ public static class RandomCards
                 Terminal.ClearLine();
                 Terminal.SetCursorPosition(3, 26);
                 Terminal.ClearLine();
-                clearTerminal = true;
+                Terminal.SetCursorPosition(3, 23);
+                Terminal.WriteLine($"Enemy has {enemyHealth} Health left ");
                 takenDamage = true;
 
                 switch (cardCommand)//expandable switch statment for all card abilities
                 {
                     case "atk"://basic attack
                         enemyHealth -= 5;
-                        majorEnemyHealth -= 5;
-                        bossEnemyHealth -= 5;
                         break;
                     case "gdl"://golden idle
                         if (!goldenIdolUsed)
@@ -70,8 +65,6 @@ public static class RandomCards
                         break;
                     case "avk"://advanced attack
                         enemyHealth -= 10;
-                        bossEnemyHealth -= 10;
-                        majorEnemyHealth -= 10;
                         break;
                     case "mss"://missed
                         Terminal.WriteLine("You Missed");
@@ -88,8 +81,6 @@ public static class RandomCards
 
                                 playerMana -= 15;
                                 enemyHealth -= 15;
-                                majorEnemyHealth -= 15;
-                                bossEnemyHealth -= 15;
                                 Terminal.WriteLine("You have used 15 Mana");
                             }
                             else
@@ -100,8 +91,6 @@ public static class RandomCards
                         break;
                     case "gsw"://Glowing Sword
                         enemyHealth -= 15;
-                        bossEnemyHealth -= 15;
-                        majorEnemyHealth -= 15;
                         Terminal.WriteLine("ooooh Shiny");
                         break;
                     case "lck"://Lucky Bastard
@@ -124,8 +113,8 @@ public static class RandomCards
                         break;
                     case "soc"://Stylish Overcoat
                         enemyHealth -= 10;
-                        majorEnemyHealth -= 10;
-                        bossEnemyHealth -= 10;
+                        
+                        
                         Terminal.WriteLine("Wow that looks good on you!");
                         break;
                     case "ahp"://Advanced Healing Potion
@@ -145,8 +134,6 @@ public static class RandomCards
                         playerMana -= 15;
                         playerHealth -= 15;
                         enemyHealth -= 10;
-                        majorEnemyHealth -= 10;
-                        bossEnemyHealth -= 10;
                         Terminal.WriteLine("Im So Sorry");
                         break;
                     case "tch"://The Coughing Death
@@ -193,8 +180,6 @@ public static class RandomCards
                             {
                                 playerMana -= 10;
                                 enemyHealth -= 5;
-                                majorEnemyHealth -= 5;
-                                bossEnemyHealth -= 5;
                                 Terminal.WriteLine("You have used 10 Mana");
                             }
                             else
@@ -223,8 +208,6 @@ public static class RandomCards
                             {
                                 playerMana -= 15;
                                 enemyHealth -= 10;
-                                majorEnemyHealth -= 10;
-                                bossEnemyHealth -= 10;
                                 Terminal.WriteLine("You have used 15 Mana");
                             }
                             else
@@ -244,14 +227,12 @@ public static class RandomCards
                             if (playerMana >= 60 && !fightingBoss)
                             {
                                 playerMana -= 60;
-                                enemyHealth = 0;
-                                majorEnemyHealth = 0;
                                 Terminal.WriteLine("You have used 60 Mana, and destroyed the enemy");
                             }
                             else if (playerMana >= 60 && fightingBoss)
                             {
                                 playerMana -= 60;
-                                bossEnemyHealth -= 40;
+                                enemyHealth -= 40;
                                 Terminal.WriteLine("You have used 60 Mana, and damaged the enemy");
                             }
                             else
@@ -266,8 +247,6 @@ public static class RandomCards
                             {
                                 playerMana -= 20;
                                 enemyHealth -= 15;
-                                majorEnemyHealth -= 15;
-                                bossEnemyHealth -= 15;
                                 Terminal.WriteLine("You have used 20 Mana");
                             }
                             else
@@ -282,8 +261,6 @@ public static class RandomCards
                             {
                                 playerMana -= 15;
                                 enemyHealth -= 10;
-                                majorEnemyHealth -= 10;
-                                bossEnemyHealth -= 10;
                                 Terminal.WriteLine("You have used 15 Mana");
                             }
                             else
@@ -298,8 +275,6 @@ public static class RandomCards
                             {
                                 playerMana -= 25;
                                 enemyHealth -= 20;
-                                majorEnemyHealth -= 20;
-                                bossEnemyHealth -= 15;
                                 Terminal.WriteLine("You have used 25 Mana");
                             }
                             else
@@ -314,8 +289,6 @@ public static class RandomCards
                         Terminal.Beep();
                         break;
                 }
-                Terminal.WriteLine($"Enemy has {enemyHealth} Health left ");
-
             }
         }
     }

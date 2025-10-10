@@ -30,6 +30,7 @@ public class TerminalGame
     (int x, int y, ColoredText sprite)[] townEnemies;
     (int x, int y, ColoredText sprite)[] forestEnemies;
     (int x, int y, ColoredText sprite)[] castleEnemies;
+    public int locationEnemyDamage = 1;
     public int enemyDamage = Random.Integer(2, 8);// Random generator from 2-7 to cause damage to the player
     public int majorEnemyDamage = Random.Integer(5, 20);// Random generator from 5-19 to cause damage to the player
     public int bossEnemyDamage = Random.Integer(10, 26);//Random generator from 10-25 to cause damage to the player
@@ -137,12 +138,13 @@ public class TerminalGame
             }
             if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
             {
-                RandomCards.playerHealth -= enemyDamage;
+                RandomCards.playerHealth -= locationEnemyDamage;
                 Console.WriteLine($"The enemy has attacked you,You have {RandomCards.playerHealth} health left");
                 RandomCards.takenDamage = false;
             }
             if (RandomCards.inCombatMode)
             {
+                setEnemyHealth(playerX);
                 Console.WriteLine($"you have {RandomCards.playerMana} mana left");
                 Console.WriteLine("Enter a code from a card!");
 
@@ -202,7 +204,7 @@ public class TerminalGame
             case "combat":
                 if (!RandomCards.inCombatMode)
                 {
-                    RandomCards.enemyHealth = RandomCards.locationHealth;
+                    setEnemyHealth(playerX);
                     Terminal.WriteLine("Player has entered combat mode");
                     RandomCards.inCombatMode = true;
                 }//command to enter combat
@@ -398,8 +400,29 @@ public class TerminalGame
     (int x, int y, ColoredText sprite)[] GetCurrentAreaEnemies(int x)
     {
         int third = map.Width / 3;
-        if (x < third) return townEnemies;
+        if (x < third)
+            return townEnemies;
         if (x < 2 * third) return forestEnemies;
         return castleEnemies;
+    }
+    public void setEnemyHealth(int playerX)//sets the enemys stats where the player is
+    {
+        int third = map.Width / 3;
+        if (playerX < third)
+        {
+            RandomCards.locationHealth = 25;//town
+            locationEnemyDamage = enemyDamage;
+        }
+        else if (playerX < 2 * third)
+        {
+            RandomCards.locationHealth = 40; //forest
+            locationEnemyDamage = majorEnemyDamage;
+        }
+        else
+        {
+            RandomCards.fightingBoss = true;
+            locationEnemyDamage = bossEnemyDamage;
+            RandomCards.locationHealth = 200; //castle
+        }
     }
 }
