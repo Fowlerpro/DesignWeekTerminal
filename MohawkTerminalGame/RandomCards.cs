@@ -10,23 +10,18 @@ public static class RandomCards
     public static bool inCombatMode = false;
     public static int playerMana = 100;//number of ability points per round
     public static string cardCommand = "";
-    public static bool enemyDead = false;
     public static bool hasGoldenIdol = false;
     static bool goldenIdolUsed = false;
     public static bool fightingBoss = false;
     public static bool clearTerminal = false;
+    public static bool combatStartedThisEnemy;
+    public static bool combatText = true;
 
     public static void cardMoves(string cardCommand)
     {
 
-        if (inCombatMode)
+        if (!inCombatMode) return;
         {
-            if (!enemyDead)
-            {
-                enemyHealth = locationHealth;
-                enemyDead = true;
-            }
-            else
             {
                 Terminal.SetCursorPosition(3, 23);
                 Terminal.ClearLine();

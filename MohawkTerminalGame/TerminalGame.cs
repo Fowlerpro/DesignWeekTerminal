@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace MohawkTerminalGame;
@@ -80,82 +82,124 @@ public class TerminalGame
     //  ExecuteTime: runs at timed intervals (eg. "FPS"). Code tries to run at Program.TargetFPS.
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
-    {//Starts the game if player hits the spacebar
+    {
+        // Update player on the map
         UpdateCharacter(ref oldplayerX, ref oldplayerY, playerX, playerY, playerChar);
 
-
+        // Read player input
         string input = Terminal.ReadLine();
 
         if (!string.IsNullOrEmpty(input))
-        {//?.Trim gets rid of extra spaces and .ToLower makes all inputs automatically lowercase
+        {
+            string trimmedInput = input.Trim().ToLower();
+
             if (!RandomCards.inCombatMode)
             {
-                command = input.Trim().ToLower();
+                // Normal movement/commands
+                command = trimmedInput;
                 typedCommands(command);
             }
             else
             {
-                //Terminal.Clear();
-                //DrawAreas(width, height);
-                RandomCards.cardCommand = input.Trim().ToLower();
+                // Combat input
+                RandomCards.cardCommand = trimmedInput;
                 RandomCards.cardMoves(RandomCards.cardCommand);
             }
         }
-        if (!RandomCards.hasGoldenIdol)
+
+        // Handle player death
+        if (!RandomCards.hasGoldenIdol && RandomCards.playerHealth <= 0)
         {
-            if (RandomCards.playerHealth <= 0)
-            {
-                RandomCards.inCombatMode = false;
-                intro();
-                Setup();
-                startGame = false;
-                RandomCards.playerHealth = 40;
-            }
-            else
-            {
-                if (RandomCards.playerHealth <= 0)
-                {
-                    RandomCards.playerHealth = 40;
-                    RandomCards.hasGoldenIdol = false;
-                }
-            }// if player health falls to zero the title screen is displayed and player health is reset
+            RandomCards.inCombatMode = false;
+            intro();
+            Setup();
+            startGame = false;
+            RandomCards.playerHealth = 40;
+            return; // Exit Execute early after reset
+        }
 
-            if (RandomCards.playerHealth >= 101)
+        // Clamp health and mana
+        if (RandomCards.playerHealth > 100) RandomCards.playerHealth = 100;
+        if (RandomCards.playerMana > 100) RandomCards.playerMana = 100;
+
+        // Get current area enemies
+        var currentEnemies = GetCurrentAreaEnemies(playerX);
+
+        // Check if player is on an enemy tile
+        var enemyHere = currentEnemies.FirstOrDefault(e => e.x == playerX && e.y == playerY);
+
+        if (enemyHere != default)
+        {
+            // Player is on an enemy → enter combat
+            if (!RandomCards.inCombatMode)
             {
-                RandomCards.playerHealth = 100;
-                Console.WriteLine("Health is at Max");
-            }
-            if (RandomCards.playerMana >= 101)
-            {
-                RandomCards.playerHealth = 100;
-                Console.WriteLine("Mana is at Max");
-            }
-            if (RandomCards.enemyHealth <= 0) // once an enemy is killed it deactivates combat mode
-            {
-                RandomCards.inCombatMode = false;
-                Console.WriteLine("Enemy Defeated");
-                RandomCards.playerMana += 25;
-            }
-            if (RandomCards.takenDamage)//whenever an enemy attacks you it runs this command
-            {
-                RandomCards.playerHealth -= locationEnemyDamage;
-                Console.WriteLine($"The enemy has attacked you,You have {RandomCards.playerHealth} health left");
-                RandomCards.takenDamage = false;
-            }
-            if (RandomCards.inCombatMode)
-            {
+                RandomCards.inCombatMode = true;
+                RandomCards.combatStartedThisEnemy = false; // reset message flag
                 setEnemyHealth(playerX);
-                Console.WriteLine($"you have {RandomCards.playerMana} mana left");
-                Console.WriteLine("Enter a code from a card!");
-
+                RandomCards.enemyHealth = RandomCards.locationHealth;
             }
-            if (RandomCards.clearTerminal)
+
+            if (!RandomCards.combatStartedThisEnemy)
             {
-                RandomCards.clearTerminal = false;
                 ClearTextBoxArea();
                 Terminal.SetCursorPosition(3, 23);
-
+                Console.WriteLine($"You are fighting an enemy! Mana: {RandomCards.playerMana}");
+                Console.WriteLine("Enter a code from a card!");
+                RandomCards.combatStartedThisEnemy = true;
             }
+
+            // Handle enemy defeat
+            if (RandomCards.enemyHealth <= 0)
+            {
+                Console.WriteLine("Enemy Defeated! Mana restored by 25");
+                RandomCards.playerMana += 25;
+
+                // Remove enemy from appropriate array
+                if (playerX < map.Width / 3)
+                    enemyKilled(playerX, playerY, ref townEnemies);
+                else if (playerX < 2 * map.Width / 3)
+                    enemyKilled(playerX, playerY, ref forestEnemies);
+                else
+                    enemyKilled(playerX, playerY, ref castleEnemies);
+
+                RandomCards.inCombatMode = false;
+                RandomCards.combatStartedThisEnemy = false;
+                DrawEnemies();
+            }
+        }
+        else
+        {
+            // No enemy here  exit combat
+            RandomCards.inCombatMode = false;
+        }
+
+        // Handle enemy attacks
+        if (RandomCards.takenDamage)
+        {
+            RandomCards.playerHealth -= locationEnemyDamage;
+            ClearTextBoxArea();
+            Terminal.SetCursorPosition(3, 23);
+            Console.WriteLine($"The enemy has attacked you. You have {RandomCards.playerHealth} health left.");
+            RandomCards.takenDamage = false;
+        }
+
+        // Update combat info in terminal if in combat
+        if (RandomCards.inCombatMode)
+        {
+            ClearTextBoxArea();
+            Terminal.SetCursorPosition(3, 23);
+            Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left");
+            Console.WriteLine($"You have {RandomCards.playerMana} Mana left");
+            Console.WriteLine("Enter a code from a card!");
+            RandomCards.combatText = false;
+        }
+
+        // Clear terminal if requested
+        if (RandomCards.clearTerminal)
+        {
+            RandomCards.clearTerminal = false;
+            ClearTextBoxArea();
+            Terminal.SetCursorPosition(3, 23);
         }
     }
     public void typedCommands(string command)
@@ -377,14 +421,14 @@ public class TerminalGame
     // 
     // Enemy & Barrier Logic
     // 
-    bool IsNearEnemy(int x, int y, (int x, int y, ColoredText sprite)[] enemies)
+    public bool IsNearEnemy(int x, int y, (int x, int y, ColoredText sprite)[] enemies)
     {
         foreach (var (ex, ey, _) in enemies)
             if (Math.Abs(x - ex) <= 1 && Math.Abs(y - ey) <= 1) return true;
         return false;
     }
 
-    bool AreEnemiesDefeated((int x, int y, ColoredText sprite)[] enemies) => enemies.Length == 0;
+    public bool AreEnemiesDefeated((int x, int y, ColoredText sprite)[] enemies) => enemies.Length == 0;
 
     bool CanMoveTo(int x, int y)
     {
@@ -404,6 +448,23 @@ public class TerminalGame
             return townEnemies;
         if (x < 2 * third) return forestEnemies;
         return castleEnemies;
+    }
+    public void enemyKilled(int x, int y, ref (int x, int y, ColoredText sprite)[] enemies)
+    {
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (enemies[i].x == x && enemies[i].y == y)
+            {
+                // Reset the background at this enemy's position
+                ResetCell(enemies[i].x, enemies[i].y);
+
+                // Remove the enemy from the array
+                var temp = enemies.ToList();
+                temp.RemoveAt(i);
+                enemies = temp.ToArray();
+                break;
+            }
+        }
     }
     public void setEnemyHealth(int playerX)//sets the enemys stats where the player is
     {
