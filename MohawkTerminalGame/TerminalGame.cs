@@ -173,7 +173,17 @@ public class TerminalGame
             // No enemy here  exit combat
             RandomCards.inCombatMode = false;
         }
+        if (castleEnemies.Length == 0 && RandomCards.fightingBoss)
+        {
+            RandomCards.fightingBoss = false; // mark boss defeated
+            RandomCards.inCombatMode = false;  // exit combat if still active
+            ClearTextBoxArea();
+            Terminal.SetCursorPosition(3, 23);
+            Console.WriteLine("Congratulations! You have defeated the boss and completed the game!");
 
+            // Optional: stop player movement or trigger end sequence
+            startGame = false;
+        }
         // Handle enemy attacks
         if (RandomCards.takenDamage)
         {
@@ -209,26 +219,53 @@ public class TerminalGame
         Terminal.SetCursorPosition(3, 23);
         switch (command)
         {
-            case "w":
-                playerY = Math.Max(0, playerY - 1);
-                Terminal.WriteLine("Player moved up");
-                break;
-            case "s":
-                Terminal.WriteLine("Player moved down");
-                if(playerY < height -1)
-                {
-                    Terminal.WriteLine("Player moved down");
-                    playerY++;
-                }
-                break;
-            case "a":
-                playerX = Math.Max(0, playerX - 1);
-                Terminal.WriteLine("Player moved left");
-                break;
-            case "d":
-                playerX = Math.Max(0, playerX + 1);
-                Terminal.WriteLine("Player moved right");
-                break;
+case "w":
+            if (CanMoveTo(playerX, playerY - 1))
+    {
+        playerY = Math.Max(0, playerY - 1);
+        Terminal.WriteLine("Player moved up");
+    }
+    else
+    {
+        Terminal.WriteLine("You can't move there yet! Kill the enemies first.");
+    }
+    break;
+
+case "s":
+    if (CanMoveTo(playerX, playerY + 1))
+    {
+        playerY = Math.Min(height - 1, playerY + 1);
+        Terminal.WriteLine("Player moved down");
+    }
+    else
+    {
+        Terminal.WriteLine("You can't move there yet! Kill the enemies first.");
+    }
+    break;
+
+case "a":
+    if (CanMoveTo(playerX - 1, playerY))
+    {
+        playerX = Math.Max(0, playerX - 1);
+        Terminal.WriteLine("Player moved left");
+    }
+    else
+    {
+        Terminal.WriteLine("You can't move there yet! Kill the enemies first.");
+    }
+    break;
+
+case "d":
+    if (CanMoveTo(playerX + 1, playerY))
+    {
+        playerX = Math.Min(width - 1, playerX + 1);
+        Terminal.WriteLine("Player moved right");
+    }
+    else
+    {
+        Terminal.WriteLine("You can't move there yet! Kill the enemies first.");
+    }
+    break;
             case "kill":
                 Terminal.WriteLine("Player was killed via command");
                 RandomCards.playerHealth -= 40;
@@ -445,13 +482,17 @@ public class TerminalGame
 
     public bool AreEnemiesDefeated((int x, int y, ColoredText sprite)[] enemies) => enemies.Length == 0;
 
+    int requiredTownKills = 5;
+    int requiredForestKills = 7;
     bool CanMoveTo(int x, int y)
     {
         int third = map.Width / 3;
 
-        if (x == third && !AreEnemiesDefeated(townEnemies)) return false;
-        if ((x == third - 1 && !AreEnemiesDefeated(townEnemies)) || (x == 2 * third && !AreEnemiesDefeated(forestEnemies))) return false;
-        if (x == 2 * third - 1 && !AreEnemiesDefeated(forestEnemies)) return false;
+        // Town → Forest boundary
+        if (x == third && (townEnemies.Length > (7 - requiredTownKills))) return false;
+
+        // Forest → Castle boundary
+        if (x == 2 * third && (forestEnemies.Length > (9 - requiredForestKills))) return false;
 
         return true;
     }
