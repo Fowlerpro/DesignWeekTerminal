@@ -77,6 +77,9 @@ public class TerminalGame
         DrawTextBox();
         Terminal.SetCursorPosition(3, textBoxTop);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
+        Terminal.SetCursorPosition(3, textBoxTop + 5);
+        Terminal.ClearLine();
+        Terminal.WriteLine("Kill Enough Enemies to Progress, 5 for the Town, 7 for the Forest, The defeat The Boss");
         DrawCharacter(playerX, playerY, playerChar);
         Terminal.SetCursorPosition(3, textBoxTop);
 
@@ -122,6 +125,14 @@ public class TerminalGame
             startGame = false;
             RandomCards.playerHealth = 40;
             return; // Exit Execute early after reset
+        }
+        else if (RandomCards.hasGoldenIdol && RandomCards.playerHealth <=0)
+        {
+            RandomCards.hasGoldenIdol = false;
+            RandomCards.playerHealth = 100;
+            Terminal.SetCursorPosition(3, textBoxTop + 4);
+            Terminal.ClearLine();
+            Terminal.WriteLine("Your Extra Life Was used");
         }
 
         // Clamp health and mana
@@ -209,6 +220,10 @@ public class TerminalGame
             Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left and {RandomCards.playerHealth} Health Left");
             Terminal.SetCursorPosition(3, textBoxTop+1);
             Console.WriteLine("Enter a code from a card!");
+            Terminal.SetCursorPosition(3, textBoxTop + 3);
+            Terminal.ClearLine();
+            Terminal.SetCursorPosition(3, textBoxTop + 4);
+            Terminal.ClearLine();
             RandomCards.combatText = false;
         }
 
@@ -609,20 +624,18 @@ case "d":
         {
             RandomCards.locationHealth = 40; //forest
             locationEnemyDamage = majorEnemyDamage;
-            Terminal.SetCursorPosition(3, textBoxTop + 1);
+            Terminal.SetCursorPosition(3, textBoxTop + 5);
             Terminal.ClearLine();
             Terminal.WriteLine("Enemies now Have 40 health");
-            RandomCards.playerHealth = 100;
         }
         else
         {
             RandomCards.fightingBoss = true;
             locationEnemyDamage = bossEnemyDamage;
-            Terminal.SetCursorPosition(3, textBoxTop + 1);
+            Terminal.SetCursorPosition(3, textBoxTop + 5);
             Terminal.ClearLine();
             Terminal.WriteLine("The Boss Has 200 health");
-            RandomCards.locationHealth = 200; //castle
-            RandomCards.playerHealth = 100;
+            RandomCards.locationHealth = 130; //castle
         }
     }
 }

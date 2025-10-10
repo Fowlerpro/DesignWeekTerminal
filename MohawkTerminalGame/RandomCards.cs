@@ -19,6 +19,10 @@ public static class RandomCards
 
     public static void cardMoves(string cardCommand, int textBoxTop)
     {
+        Terminal.SetCursorPosition(3, textBoxTop + 4);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(3, textBoxTop + 5);
+        Terminal.ClearLine();
 
         if (!inCombatMode) return;
         {
@@ -202,10 +206,10 @@ public static class RandomCards
                         Terminal.WriteLine("Its Kebab Time, lose 15 health and 10 Mana");
                         break;
                     case "drk"://Dark Angel
-                        playerHealth -= 20;
+                        playerMana -= 20;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("What is that doing here?, lose 20 health");
+                        Terminal.WriteLine("What is that doing here?, lose 20 Mana");
                         break;
                     case "wzd"://Wizzard of the South
                         playerMana -= 15;
