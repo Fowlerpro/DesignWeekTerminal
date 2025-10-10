@@ -23,6 +23,7 @@ public class TerminalGame
 
     //  Map 
     ColoredText[,] backgroundTiles;
+    ColoredText[,] terrainTiles;
 
 
     // Text box
@@ -141,7 +142,7 @@ public class TerminalGame
 
             if (!RandomCards.combatStartedThisEnemy)
             {
-                ClearTextBoxArea();
+               
                 Terminal.SetCursorPosition(3, 23);
                 Console.WriteLine($"You are fighting an enemy! Mana: {RandomCards.playerMana}");
                 Console.WriteLine("Enter a code from a card!");
@@ -188,8 +189,8 @@ public class TerminalGame
         {
             ClearTextBoxArea();
             Terminal.SetCursorPosition(3, 23);
-            Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left");
-            Console.WriteLine($"You have {RandomCards.playerMana} Mana left");
+            Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left ");
+            Terminal.SetCursorPosition(3, 24);
             Console.WriteLine("Enter a code from a card!");
             RandomCards.combatText = false;
         }
@@ -374,11 +375,25 @@ public class TerminalGame
     }
 
 
-   public void DrawEnemies()
+    public void DrawEnemies()
     {
-        foreach (var (x, y, sprite) in townEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
-        foreach (var (x, y, sprite) in forestEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
-        foreach (var (x, y, sprite) in castleEnemies) { backgroundTiles[x, y] = sprite; map.Poke(x * 2, y, sprite); }
+        // Redraw terrain
+        for (int y = 0; y < map.Height; y++)
+        {
+            for (int x = 0; x < map.Width; x++)
+            {
+                // Only draw terrain tiles (ignore enemies)
+                if (backgroundTiles[x, y].text != "😠" && backgroundTiles[x, y].text != "😡" && backgroundTiles[x, y].text != "😈")
+                    map.Poke(x * 2, y, backgroundTiles[x, y]);
+                else
+                    map.Poke(x * 2, y, new ColoredText("  ", backgroundTiles[x, y].fgColor, backgroundTiles[x, y].bgColor));
+            }
+        }
+
+        // Draw enemies
+        foreach (var (x, y, sprite) in townEnemies) map.Poke(x * 2, y, sprite);
+        foreach (var (x, y, sprite) in forestEnemies) map.Poke(x * 2, y, sprite);
+        foreach (var (x, y, sprite) in castleEnemies) map.Poke(x * 2, y, sprite);
     }
     public void intro()
     {//Starting title screen
@@ -410,7 +425,7 @@ public class TerminalGame
         Console.ForegroundColor = ConsoleColor.White;
         Console.BackgroundColor = ConsoleColor.Black;
 
-        for (int i = 23; i <= 28; i++) // the text area lines you clear
+        for (int i = 23; i <= 24; i++) // the text area lines you clear
         {
             Console.SetCursorPosition(0, i);
             Console.Write(new string(' ', Console.WindowWidth));
