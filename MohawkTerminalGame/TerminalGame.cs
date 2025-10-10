@@ -627,6 +627,7 @@ case "d":
             Terminal.SetCursorPosition(3, textBoxTop + 5);
             Terminal.ClearLine();
             Terminal.WriteLine("Enemies now Have 40 health");
+
         }
         else
         {
