@@ -51,30 +51,34 @@ public class TerminalGame
         Program.TargetFPS = 60;
         Terminal.CursorVisible = false;
         Terminal.SetCursorPosition(0, 5);
-
+        SetupEnemies(width, height);
         Terminal.SetTitle("Tales from the Past");
+
         intro();
 
-        
+        // Wait for ENTER
 
+
+        string input = Terminal.ReadLine(); 
+        Terminal.Clear();
+        startGame = true;
         map = new TerminalGridWithColor(width, height, new ColoredText("  ", ConsoleColor.Black, ConsoleColor.Black));
         backgroundTiles = new ColoredText[width, height];
 
-        
+        Terminal.SetCursorPosition(3, 23);
+        textBoxTop = height + 1;
 
-        // Initialize players at bottom-left
         playerX = 0;
         playerY = height - 1;
-        SetupEnemies(width, height);
+
         oldplayerX = playerX; oldplayerY = playerY;
         DrawAreas(width, height);
-        DrawCharacter(playerX, playerY, playerChar);
         DrawEnemies();
-        textBoxTop = height + 1;
         DrawTextBox();
-        Terminal.SetCursorPosition(3, 23);
+        Terminal.SetCursorPosition(3, textBoxTop);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
-        
+        DrawCharacter(playerX, playerY, playerChar);
+
     }
 
     // Execute() runs based on Program.TerminalExecuteMode (assign to it in Setup).
@@ -104,7 +108,7 @@ public class TerminalGame
             {
                 // Combat input
                 RandomCards.cardCommand = trimmedInput;
-                RandomCards.cardMoves(RandomCards.cardCommand);
+                RandomCards.cardMoves(RandomCards.cardCommand,textBoxTop);
             }
         }
 
@@ -143,7 +147,7 @@ public class TerminalGame
             if (!RandomCards.combatStartedThisEnemy)
             {
                
-                Terminal.SetCursorPosition(3, 23);
+                Terminal.SetCursorPosition(3, textBoxTop);
                 Console.WriteLine($"You are fighting an enemy! Mana: {RandomCards.playerMana}");
                 Console.WriteLine("Enter a code from a card!");
                 RandomCards.combatStartedThisEnemy = true;
@@ -178,7 +182,7 @@ public class TerminalGame
             RandomCards.fightingBoss = false; // mark boss defeated
             RandomCards.inCombatMode = false;  // exit combat if still active
             ClearTextBoxArea();
-            Terminal.SetCursorPosition(3, 23);
+            Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine("Congratulations! You have defeated the boss and completed the game!");
 
             // Optional: stop player movement or trigger end sequence
@@ -189,7 +193,7 @@ public class TerminalGame
         {
             RandomCards.playerHealth -= locationEnemyDamage;
             ClearTextBoxArea();
-            Terminal.SetCursorPosition(3, 23);
+            Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine($"The enemy has attacked you. You have {RandomCards.playerHealth} health left.");
             RandomCards.takenDamage = false;
         }
@@ -198,7 +202,7 @@ public class TerminalGame
         if (RandomCards.inCombatMode)
         {
             ClearTextBoxArea();
-            Terminal.SetCursorPosition(3, 23);
+            Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left ");
             Terminal.SetCursorPosition(3, 24);
             Console.WriteLine("Enter a code from a card!");
@@ -210,15 +214,22 @@ public class TerminalGame
         {
             RandomCards.clearTerminal = false;
             ClearTextBoxArea();
-            Terminal.SetCursorPosition(3, 23);
+            Terminal.SetCursorPosition(3, textBoxTop);
         }
     }
     public void typedCommands(string command)
     {
         ClearTextBoxArea();
-        Terminal.SetCursorPosition(3, 23);
+        Terminal.SetCursorPosition(3, textBoxTop);
         switch (command)
         {
+            case "":
+            if (!startGame)
+                {
+                    intro();
+                }
+            break;
+
 case "w":
             if (CanMoveTo(playerX, playerY - 1))
     {
@@ -434,7 +445,22 @@ case "d":
     }
     public void intro()
     {//Starting title screen
-        Terminal.WriteLine("Type enter to start playing!");
+        string logo = @"
+ /$$$$$$$$        /$$                            /$$$$$$   /$$$$$$        /$$$$$$$$ /$$                       /$$$$$$$                       /$$          
+|__  $$__/       | $$                           /$$__  $$ /$$__  $$      |__  $$__/| $$                      | $$__  $$                     | $$          
+   | $$  /$$$$$$ | $$  /$$$$$$   /$$$$$$$      | $$  \ $$| $$  \__/         | $$   | $$$$$$$   /$$$$$$       | $$  \ $$ /$$$$$$   /$$$$$$$ /$$$$$$        
+   | $$ |____  $$| $$ /$$__  $$ /$$_____/      | $$  | $$| $$$$             | $$   | $$__  $$ /$$__  $$      | $$$$$$$/|____  $$ /$$_____/|_  $$_/        
+   | $$  /$$$$$$$| $$| $$$$$$$$|  $$$$$$       | $$  | $$| $$_/             | $$   | $$  \ $$| $$$$$$$$      | $$____/  /$$$$$$$|  $$$$$$   | $$          
+   | $$ /$$__  $$| $$| $$_____/ \____  $$      | $$  | $$| $$               | $$   | $$  | $$| $$_____/      | $$      /$$__  $$ \____  $$  | $$ /$$      
+   | $$|  $$$$$$$| $$|  $$$$$$$ /$$$$$$$/      |  $$$$$$/| $$               | $$   | $$  | $$|  $$$$$$$      | $$     |  $$$$$$$ /$$$$$$$/  |  $$$$/      
+   |__/ \_______/|__/ \_______/|_______/        \______/ |__/               |__/   |__/  |__/ \_______/      |__/      \_______/|_______/    \___/        
+                                                                                                                                                    
+";
+
+        Terminal.WriteLine(logo);
+        Terminal.WriteLine("");
+        Terminal.WriteLine("                      Press ENTER to Start");
+
     }
     void DrawTextBox()
     {
@@ -462,7 +488,7 @@ case "d":
         Console.ForegroundColor = ConsoleColor.White;
         Console.BackgroundColor = ConsoleColor.Black;
 
-        for (int i = 23; i <= 24; i++) // the text area lines you clear
+        for (int i = textBoxTop; i < textBoxTop + 2; i++) // clear input + next line
         {
             Console.SetCursorPosition(0, i);
             Console.Write(new string(' ', Console.WindowWidth));
@@ -534,12 +560,14 @@ case "d":
         {
             RandomCards.locationHealth = 40; //forest
             locationEnemyDamage = majorEnemyDamage;
+            RandomCards.playerHealth = 100;
         }
         else
         {
             RandomCards.fightingBoss = true;
             locationEnemyDamage = bossEnemyDamage;
             RandomCards.locationHealth = 200; //castle
+            RandomCards.playerHealth = 100;
         }
     }
 }
