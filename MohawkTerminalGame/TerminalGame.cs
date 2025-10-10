@@ -40,7 +40,7 @@ public class TerminalGame
         Program.TerminalInputMode = TerminalInputMode.KeyboardReadAndReadLine;
         Program.TargetFPS = 60;
         Terminal.CursorVisible = false;
-        Terminal.SetCursorPosition(0, 0);
+        Terminal.SetCursorPosition(0, 5);
 
         Terminal.SetTitle("Tales from the Past");
         intro();
@@ -57,7 +57,6 @@ public class TerminalGame
         playerY = height - 1;
         SetupEnemies(width, height);
         oldplayerX = playerX; oldplayerY = playerY;
-        Terminal.Clear();
         DrawAreas(width, height);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
     }
@@ -148,7 +147,18 @@ public class TerminalGame
     }
     public void typedCommands(string command)
     {
-       switch(command)
+        Terminal.SetCursorPosition(0, 24);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(0, 25);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(0, 26);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(0, 27);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(0, 28);
+        Terminal.ClearLine();
+
+        switch (command)
         {
             case "w":
                 playerY = Math.Max(0, playerY - 1);
@@ -186,7 +196,7 @@ public class TerminalGame
             case "combat":
                 if (!RandomCards.inCombatMode)
                 {
-                    RandomCards.enemyHealth = 20;
+                    RandomCards.enemyHealth = RandomCards.locationHealth;
                     Terminal.WriteLine("Player has entered combat mode");
                     RandomCards.inCombatMode = true;
                 }//command to enter combat
@@ -204,19 +214,7 @@ public class TerminalGame
                 break;
 
         }
-        Terminal.Clear();
-        DrawAreas(width, height);
         var currentEnemies = GetCurrentAreaEnemies(playerX);
-    }
-    public void Reload()
-    {
-        if (RandomCards.mapClear)
-        {
-            
-            Terminal.Clear();
-            DrawAreas(width, height);
-        }
-        RandomCards.mapClear = false;
     }
     // Character Drawing 
     public void UpdateCharacter(ref int oldX, ref int oldY, int newX, int newY, ColoredText character)

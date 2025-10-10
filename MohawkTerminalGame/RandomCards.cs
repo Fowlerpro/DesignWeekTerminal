@@ -3,15 +3,16 @@ using MohawkTerminalGame;
 
 public static class RandomCards
 {
-    public static int enemyHealth = 20;// health of every single enemy
-    public static int majorEnemyHealth = 40;// health of every single enemy
+    public static int locationHealth = 1;
+    public static int enemyHealth = locationHealth;// health of every single enemy
+    public static int minorEnemyHealth = 25;// health of every single enemy
     public static int bossEnemyHealth = 200;
+    public static int majorEnemyHealth = 40;// health of every single enemy
     public static int playerHealth = 100;//this is the player health change this to make the game easier or harder
     public static bool takenDamage = false;
     public static bool inCombatMode = false;
     public static int playerMana = 100;//number of ability points per round
     public static string cardCommand = "";
-    public static bool mapClear = false;
     public static bool enemyDead = false;
     public static bool hasGoldenIdol = false;
     static bool goldenIdolUsed = false;
@@ -24,12 +25,20 @@ public static class RandomCards
         {
             if (!enemyDead)
             {
-                enemyHealth = 25;
+                locationHealth = minorEnemyHealth;
+                enemyHealth = locationHealth;
                 enemyDead = true;
-                mapClear = true;
             }
             else
             {
+                Terminal.SetCursorPosition(0, 25);
+                Terminal.ClearLine();
+                Terminal.SetCursorPosition(0, 26);
+                Terminal.ClearLine();
+                Terminal.SetCursorPosition(0, 27);
+                Terminal.ClearLine();
+                Terminal.SetCursorPosition(0, 28);
+                Terminal.ClearLine();
                 takenDamage = true;
 
                 switch (cardCommand)//expandable switch statment for all card abilities
