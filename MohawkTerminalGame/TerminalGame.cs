@@ -204,7 +204,7 @@ public class TerminalGame
             ClearTextBoxArea();
             Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left ");
-            Terminal.SetCursorPosition(3, 24);
+            Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine("Enter a code from a card!");
             RandomCards.combatText = false;
         }
