@@ -31,14 +31,20 @@ public static class RandomCards
             }
             else
             {
-                Terminal.SetCursorPosition(0, 25);
+                Terminal.SetCursorPosition(3, 23);
                 Terminal.ClearLine();
-                Terminal.SetCursorPosition(0, 26);
+                Terminal.SetCursorPosition(3, 24);
                 Terminal.ClearLine();
-                Terminal.SetCursorPosition(0, 27);
+                Terminal.SetCursorPosition(3, 25);
                 Terminal.ClearLine();
-                Terminal.SetCursorPosition(0, 28);
+                Terminal.SetCursorPosition(3, 26);
                 Terminal.ClearLine();
+                Terminal.SetCursorPosition(3, 27);
+                Terminal.ClearLine();
+                Terminal.SetCursorPosition(3, 28);
+                Terminal.ClearLine();
+                Terminal.SetCursorPosition(3, 23);
+
                 takenDamage = true;
 
                 switch (cardCommand)//expandable switch statment for all card abilities

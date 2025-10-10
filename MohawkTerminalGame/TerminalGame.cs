@@ -24,8 +24,6 @@ public class TerminalGame
 
 
     // Text box
-    StringBuilder textBoxInput = new();
-    public int mapHeight;
     public int textBoxTop;
 
     //  Enemies 
@@ -39,8 +37,8 @@ public class TerminalGame
 
     string command = "";// empty string variable to be used in the command function
     public int width = Console.WindowWidth / 2;
-    mapHeight = (int) (Console.WindowHeight* 0.75); // 75% map
-    textBoxTop = mapHeight;
+    public int height = Console.WindowHeight - 8;
+
     public void Setup()
     {
 
@@ -66,7 +64,13 @@ public class TerminalGame
         SetupEnemies(width, height);
         oldplayerX = playerX; oldplayerY = playerY;
         DrawAreas(width, height);
+        DrawCharacter(playerX, playerY, playerChar);
+        DrawEnemies();
+        textBoxTop = height + 1;
+        DrawTextBox();
+        Terminal.SetCursorPosition(3, 23);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
+        
     }
 
     // Execute() runs based on Program.TerminalExecuteMode (assign to it in Setup).
@@ -76,13 +80,6 @@ public class TerminalGame
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
     {//Starts the game if player hits the spacebar
-        
-        //Terminal.Clear();
-        //DrawAreas(width, height);
-        DrawCharacter(playerX, playerY, playerChar);
-        DrawEnemies();
-
-
         playerMovedThisFrame = false;
         UpdateCharacter(ref oldplayerX, ref oldplayerY, playerX, playerY, playerChar);
 
@@ -155,16 +152,19 @@ public class TerminalGame
     }
     public void typedCommands(string command)
     {
-        Terminal.SetCursorPosition(0, 24);
+        Terminal.SetCursorPosition(3, 23);
         Terminal.ClearLine();
-        Terminal.SetCursorPosition(0, 25);
+        Terminal.SetCursorPosition(3, 24);
         Terminal.ClearLine();
-        Terminal.SetCursorPosition(0, 26);
+        Terminal.SetCursorPosition(3, 25);
         Terminal.ClearLine();
-        Terminal.SetCursorPosition(0, 27);
+        Terminal.SetCursorPosition(3, 26);
         Terminal.ClearLine();
-        Terminal.SetCursorPosition(0, 28);
+        Terminal.SetCursorPosition(3, 27);
         Terminal.ClearLine();
+        Terminal.SetCursorPosition(3, 28);
+        Terminal.ClearLine();
+        Terminal.SetCursorPosition(3, 23);
 
         switch (command)
         {
@@ -173,8 +173,12 @@ public class TerminalGame
                 Terminal.WriteLine("Player moved up");
                 break;
             case "s":
-                playerY = Math.Max(0, playerY + 1);
                 Terminal.WriteLine("Player moved down");
+                if(playerY < height -1)
+                {
+                    Terminal.WriteLine("Player moved down");
+                    playerY++;
+                }
                 break;
             case "a":
                 playerX = Math.Max(0, playerX - 1);
@@ -338,7 +342,27 @@ public class TerminalGame
     }
     public void intro()
     {//Starting title screen
-        Terminal.WriteLine("Type W to start playing!");
+        Terminal.WriteLine("Type enter to start playing!");
+    }
+    void DrawTextBox()
+    {
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.BackgroundColor = ConsoleColor.Black;
+
+        int width = Console.WindowWidth;
+        int height = Console.WindowHeight - textBoxTop;
+
+        for (int i = 0; i < height; i++)
+        {
+            Console.SetCursorPosition(0, textBoxTop + i);
+            Console.Write(new string(' ', width), ConsoleColor.White, ConsoleColor.Black);
+        }
+
+        Console.SetCursorPosition(0, textBoxTop - 1);
+        Console.WriteLine(new string('═', width));
+        Console.Write(" > ");
+        Console.ResetColor();
     }
     // 
     // Enemy & Barrier Logic
