@@ -78,6 +78,7 @@ public class TerminalGame
         Terminal.SetCursorPosition(3, textBoxTop);
         Terminal.WriteLine("To Move type W,A,S,D then press ENTER");
         DrawCharacter(playerX, playerY, playerChar);
+        Terminal.SetCursorPosition(3, textBoxTop);
 
     }
 
@@ -126,6 +127,7 @@ public class TerminalGame
         // Clamp health and mana
         if (RandomCards.playerHealth > 100) RandomCards.playerHealth = 100;
         if (RandomCards.playerMana > 100) RandomCards.playerMana = 100;
+        if (RandomCards.playerMana < 0) RandomCards.playerMana = 0;
 
         // Get current area enemies
         var currentEnemies = GetCurrentAreaEnemies(playerX);
@@ -138,6 +140,7 @@ public class TerminalGame
             // Player is on an enemy → enter combat
             if (!RandomCards.inCombatMode)
             {
+                ClearTextBoxArea();
                 RandomCards.inCombatMode = true;
                 RandomCards.combatStartedThisEnemy = false; // reset message flag
                 setEnemyHealth(playerX);
@@ -149,7 +152,6 @@ public class TerminalGame
                
                 Terminal.SetCursorPosition(3, textBoxTop);
                 Console.WriteLine($"You are fighting an enemy! Mana: {RandomCards.playerMana}");
-                Console.WriteLine("Enter a code from a card!");
                 RandomCards.combatStartedThisEnemy = true;
             }
 
@@ -170,6 +172,7 @@ public class TerminalGame
                 RandomCards.inCombatMode = false;
                 RandomCards.combatStartedThisEnemy = false;
                 DrawEnemies();
+                playerY = Math.Min(height - 1, playerY + 1);
             }
         }
         else
@@ -184,7 +187,7 @@ public class TerminalGame
             ClearTextBoxArea();
             Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine("Congratulations! You have defeated the boss and completed the game!");
-
+            Setup();
             // Optional: stop player movement or trigger end sequence
             startGame = false;
         }
@@ -192,9 +195,9 @@ public class TerminalGame
         if (RandomCards.takenDamage)
         {
             RandomCards.playerHealth -= locationEnemyDamage;
-            ClearTextBoxArea();
             Terminal.SetCursorPosition(3, textBoxTop);
             Console.WriteLine($"The enemy has attacked you. You have {RandomCards.playerHealth} health left.");
+
             RandomCards.takenDamage = false;
         }
 
@@ -203,8 +206,8 @@ public class TerminalGame
         {
             ClearTextBoxArea();
             Terminal.SetCursorPosition(3, textBoxTop);
-            Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left ");
-            Terminal.SetCursorPosition(3, textBoxTop);
+            Console.WriteLine($"Enemy has {RandomCards.enemyHealth} Health left and You have {RandomCards.playerMana} Mana left and {RandomCards.playerHealth} Health Left");
+            Terminal.SetCursorPosition(3, textBoxTop+1);
             Console.WriteLine("Enter a code from a card!");
             RandomCards.combatText = false;
         }
@@ -606,12 +609,18 @@ case "d":
         {
             RandomCards.locationHealth = 40; //forest
             locationEnemyDamage = majorEnemyDamage;
+            Terminal.SetCursorPosition(3, textBoxTop + 1);
+            Terminal.ClearLine();
+            Terminal.WriteLine("Enemies now Have 40 health");
             RandomCards.playerHealth = 100;
         }
         else
         {
             RandomCards.fightingBoss = true;
             locationEnemyDamage = bossEnemyDamage;
+            Terminal.SetCursorPosition(3, textBoxTop + 1);
+            Terminal.ClearLine();
+            Terminal.WriteLine("The Boss Has 200 health");
             RandomCards.locationHealth = 200; //castle
             RandomCards.playerHealth = 100;
         }

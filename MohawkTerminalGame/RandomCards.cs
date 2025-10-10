@@ -29,6 +29,9 @@ public static class RandomCards
                 {
                     case "atk"://basic attack
                         enemyHealth -= 5;
+                        Terminal.SetCursorPosition(3, textBoxTop + 2);
+                        Terminal.ClearLine();
+                        Terminal.WriteLine("Deal 5 damage");
                         break;
                     case "gdl"://golden idle
                         if (!goldenIdolUsed)
@@ -48,6 +51,9 @@ public static class RandomCards
                         break;
                     case "hpn"://basic healing potion
                         playerHealth += 5;
+                        Terminal.SetCursorPosition(3, textBoxTop + 2);
+                        Terminal.ClearLine();
+                        Terminal.WriteLine("Heal 5");
                         break;
                     case "mpn"://basic mana potion
                         playerMana += 5;
@@ -76,7 +82,7 @@ public static class RandomCards
                                 enemyHealth -= 15;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 15 Mana");
+                                Terminal.WriteLine("You have used 15 Mana, You Deal 15 Damage");
                             }
                             else
                             {
@@ -90,7 +96,7 @@ public static class RandomCards
                         enemyHealth -= 15;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("ooooh Shiny");
+                        Terminal.WriteLine("ooooh Shiny, You deal 15 Damage");
                         break;
                     case "lck"://Lucky Bastard
                         playerHealth += 50;
@@ -104,24 +110,25 @@ public static class RandomCards
                         playerMana += 10;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Seems Pretty Special");
+                        Terminal.WriteLine("Seems Pretty Special, Heal 15 health and restore 10 Mana");
                         break;
                     case "mga"://Magical Armor
                         playerHealth += 5;
                         playerMana += 15;
+                        Terminal.WriteLine("You restored 5 health and 15 mana");
                         break;
                     case "ckm"://Cooked Meat
                         playerHealth += 10;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Damn that smells Good!");
+                        Terminal.WriteLine("Damn that smells Good!, Heal 10 Health");
                         break;
                     case "soc"://Stylish Overcoat
                         enemyHealth -= 10;
 
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Wow that looks good on you!");
+                        Terminal.WriteLine("Wow that looks good on you!, Deal 10 Damage");
                         break;
                     case "ahp"://Advanced Healing Potion
                         playerHealth += 25;
@@ -133,7 +140,7 @@ public static class RandomCards
                         playerMana += 35;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("nighty Night Sleepy Head");
+                        Terminal.WriteLine("nighty Night Sleepy Head, Restore 35 Mana");
                         break;
                     case "rpn"://Recovery Potion
                         playerMana += 15;
@@ -148,63 +155,63 @@ public static class RandomCards
                         enemyHealth -= 10;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Im So Sorry");
+                        Terminal.WriteLine("Im So Sorry, lose 15 Mana and 15 Health Deal 10 Damage");
                         break;
                     case "tch"://The Coughing Death
                         playerHealth -= 25;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("This is Pretty Bad");
+                        Terminal.WriteLine("This is Pretty Bad, lose 25 health");
                         break;
                     case "tbd"://The Black Death
                         playerHealth -= 50;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("How did it get this Bad");
+                        Terminal.WriteLine("How did it get this Bad, lose 50 Health");
                         break;
                     case "whs"://Whoops
                         playerHealth -= 5;
                         playerMana -= 5;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("you break your leg");
+                        Terminal.WriteLine("you break your leg, lose 5 Health and 5 Mana");
                         break;
                     case "lku"://Look Up
                         playerHealth -= 1;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Hey its a rock");
+                        Terminal.WriteLine("Hey its a rock, lose 1 Health");
                         break;
                     case "amb"://Ambush
                         playerHealth -= 15;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("You get Jumped by Monsters");
+                        Terminal.WriteLine("You get Jumped by Monsters, lose 15 Health");
                         break;
                     case "mug"://Mugged
                         playerHealth -= 10;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("A Cloaked Man Stabs you");
+                        Terminal.WriteLine("A Cloaked Man Stabs you, lose 10 Health");
                         break;
                     case "brg"://Barrage of Arrows
                         playerHealth -= 15;
                         playerMana -= 10;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("Its Kebab Time");
+                        Terminal.WriteLine("Its Kebab Time, lose 15 health and 10 Mana");
                         break;
                     case "drk"://Dark Angel
                         playerHealth -= 20;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("What is that doing here?");
+                        Terminal.WriteLine("What is that doing here?, lose 20 health");
                         break;
                     case "wzd"://Wizzard of the South
                         playerMana -= 15;
                         Terminal.SetCursorPosition(3, textBoxTop + 2);
                         Terminal.ClearLine();
-                        Terminal.WriteLine("But we are in the North did he get lost?");
+                        Terminal.WriteLine("But we are in the North did he get lost?, lose 15 Mana");
                         break;
                     case "sld"://shield Bash
                         {
@@ -214,7 +221,7 @@ public static class RandomCards
                                 enemyHealth -= 5;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 10 Mana");
+                                Terminal.WriteLine("You have used 10 Mana, and Dealt 5 Damage");
                             }
                             else
                             {
@@ -250,7 +257,7 @@ public static class RandomCards
                                 enemyHealth -= 10;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 15 Mana");
+                                Terminal.WriteLine("You have used 15 Mana, and dealt 10 Damage");
                             }
                             else
                             {
@@ -301,7 +308,7 @@ public static class RandomCards
                                 enemyHealth -= 15;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 20 Mana");
+                                Terminal.WriteLine("You have used 20 Mana, and Dealt 15 damage");
                             }
                             else
                             {
@@ -319,7 +326,7 @@ public static class RandomCards
                                 enemyHealth -= 10;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 15 Mana");
+                                Terminal.WriteLine("You have used 15 Mana, and Dealt 10 Damage");
                             }
                             else
                             {
@@ -337,7 +344,7 @@ public static class RandomCards
                                 enemyHealth -= 20;
                                 Terminal.SetCursorPosition(3, textBoxTop + 2);
                                 Terminal.ClearLine();
-                                Terminal.WriteLine("You have used 25 Mana");
+                                Terminal.WriteLine("You have used 25 Mana, and Dealt 20 damage");
                             }
                             else
                             {
