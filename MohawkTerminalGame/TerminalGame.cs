@@ -80,7 +80,6 @@ public class TerminalGame
     //               Code must finish within the alloted time frame for this to work well.
     public void Execute()
     {//Starts the game if player hits the spacebar
-        playerMovedThisFrame = false;
         UpdateCharacter(ref oldplayerX, ref oldplayerY, playerX, playerY, playerChar);
 
 
@@ -148,24 +147,19 @@ public class TerminalGame
                 Console.WriteLine("Enter a code from a card!");
 
             }
+            if (RandomCards.clearTerminal)
+            {
+                RandomCards.clearTerminal = false;
+                ClearTextBoxArea();
+                Terminal.SetCursorPosition(3, 23);
+
+            }
         }
     }
     public void typedCommands(string command)
     {
+        ClearTextBoxArea();
         Terminal.SetCursorPosition(3, 23);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 24);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 25);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 26);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 27);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 28);
-        Terminal.ClearLine();
-        Terminal.SetCursorPosition(3, 23);
-
         switch (command)
         {
             case "w":
@@ -362,6 +356,20 @@ public class TerminalGame
         Console.SetCursorPosition(0, textBoxTop - 1);
         Console.WriteLine(new string('═', width));
         Console.Write(" > ");
+        Console.ResetColor();
+    }
+    public void ClearTextBoxArea()
+    {
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.BackgroundColor = ConsoleColor.Black;
+
+        for (int i = 23; i <= 28; i++) // the text area lines you clear
+        {
+            Console.SetCursorPosition(0, i);
+            Console.Write(new string(' ', Console.WindowWidth));
+        }
+
         Console.ResetColor();
     }
     // 

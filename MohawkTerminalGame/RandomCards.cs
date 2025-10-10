@@ -17,6 +17,7 @@ public static class RandomCards
     public static bool hasGoldenIdol = false;
     static bool goldenIdolUsed = false;
     public static bool fightingBoss = false;
+    public static bool clearTerminal = false;
 
     public static void cardMoves(string cardCommand)
     {
@@ -39,12 +40,7 @@ public static class RandomCards
                 Terminal.ClearLine();
                 Terminal.SetCursorPosition(3, 26);
                 Terminal.ClearLine();
-                Terminal.SetCursorPosition(3, 27);
-                Terminal.ClearLine();
-                Terminal.SetCursorPosition(3, 28);
-                Terminal.ClearLine();
-                Terminal.SetCursorPosition(3, 23);
-
+                clearTerminal = true;
                 takenDamage = true;
 
                 switch (cardCommand)//expandable switch statment for all card abilities
