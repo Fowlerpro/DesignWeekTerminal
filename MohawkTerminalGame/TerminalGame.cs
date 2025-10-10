@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 
 namespace MohawkTerminalGame;
 
@@ -20,6 +21,12 @@ public class TerminalGame
 
     //  Map 
     ColoredText[,] backgroundTiles;
+
+
+    // Text box
+    StringBuilder textBoxInput = new();
+    int mapHeight;
+    int textBoxTop;
 
     //  Enemies 
     (int x, int y, ColoredText sprite)[] townEnemies;
