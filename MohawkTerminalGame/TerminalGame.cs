@@ -25,8 +25,8 @@ public class TerminalGame
 
     // Text box
     StringBuilder textBoxInput = new();
-    int mapHeight;
-    int textBoxTop;
+    public int mapHeight;
+    public int textBoxTop;
 
     //  Enemies 
     (int x, int y, ColoredText sprite)[] townEnemies;
@@ -39,7 +39,8 @@ public class TerminalGame
 
     string command = "";// empty string variable to be used in the command function
     public int width = Console.WindowWidth / 2;
-    public int height = Console.WindowHeight - 6;
+    mapHeight = (int) (Console.WindowHeight* 0.75); // 75% map
+    textBoxTop = mapHeight;
     public void Setup()
     {
 
